@@ -3,7 +3,7 @@
 #### MUSA 509 | Fall 2020
 <br>
 
-<img src="https://github.com/MUSA-509/final-project-jingzong-ben/blob/master/Images/logo.png"/>
+<img src="https://github.com/MUSA-509/final-project-jingzong-ben/blob/master/Images/logo.png" style="width:200px;"/>
 
 ## Abstract
 Almost overnight, travel patterns shifted as lockdown measures were put in place. As conditions continue to fluctuate, public transit has seen an unprecedented drop off in ridership. Policymakers need reliable and current data to make decisions about what services to prioritize. Examining public transit ridership through a demographic and public health lens can identify connections between these trends. Comparing how ridership shifted as cases rose can help policymakers plan for future breakouts and predict recovery scenarios. Our app uses the Federal Transit Administration's (FTA) National Transit Database (NTD). All public transit agencies submit monthly ridership to the FTA who cleans and publishes the data for public use. This dataset currently lacks an API to make the data accessible, however it is generally regarded as high quality. Users can view trends across the country, broken down by month and mode. Using a drop-down, users can focus in on a single metro area to view ridership trends as well as existing conditions from the ACS 1-year estimates to get a profile of a pre-pandemic baseline. Bringing in public health data on the local COVID-19 breakouts will also align with the ridership trends. Having these three datasets would be an asset to transit policymakers on how best to distribute limited resources while maintaining services for essential travel.
