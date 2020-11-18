@@ -31,4 +31,5 @@ Almost overnight, travel patterns shifted as lockdown measures were put in place
 <br> Hosting: N/A; api call on a per request basis
 Access: Publicly available with Creative Commons Attribution (CC BY 4.0) License
 
-## Wireframes
+## <a href="https://www.figma.com/file/0PVeefNnvioodWHnQWbDJa/Transport-Policy-APP?node-id=0%3A1">Wireframe</a>
+<img src="https://github.com/MUSA-509/final-project-jingzong-ben/blob/master/TransportPolicyWireframe.png" style="width:800px;"/>
