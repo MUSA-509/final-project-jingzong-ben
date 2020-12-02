@@ -1,51 +1,51 @@
-GEOID10,order,metro_area
-10162,1,"Bridgeport-Stamford, CT-NY"
-11350,2,"Buffalo, NY"
-15670,3,"Charlotte, NC-SC"
-16264,4,"Chicago, IL-IN"
-16885,5,"Cincinnati, OH-KY-IN"
-17668,6,"Cleveland, OH"
-19234,7,"Columbus, OH"
-22042,8,"Dallas-Fort Worth-Arlington, TX"
-22528,9,"Dayton, OH"
-23527,10,"Denver-Aurora, CO"
-23824,11,"Detroit, MI"
-25228,12,"Durham, NC"
-31843,13,"Fresno, CA"
-37243,14,"Hartford, CT"
-89770,15,"Honolulu, HI"
-40429,16,"Houston, TX"
-41212,17,"Indianapolis, IN"
-42346,18,"Jacksonville, FL"
-47995,19,"Las Vegas-Henderson, NV"
-51445,20,"Los Angeles-Long Beach-Anaheim, CA"
-51755,21,"Louisville/Jefferson County, KY-IN"
-56602,22,"Miami, FL"
-57466,23,"Milwaukee, WI"
-57628,24,"Minneapolis-St. Paul, MN-WI"
-62407,25,"New Haven, CT"
-62677,26,"New Orleans, LA"
-63217,27,"New York-Newark, NY-NJ-CT"
-65863,28,"Orlando, FL"
-69076,29,"Philadelphia, PA-NJ-DE-MD"
-69184,30,"Phoenix-Mesa, AZ"
-69697,31,"Pittsburgh, PA"
-71317,32,"Portland, OR-WA"
-72505,33,"Providence, RI-MA"
-74179,34,"Reno, NV-CA"
-74746,35,"Richmond, VA"
-75340,36,"Riverside-San Bernardino, CA"
-75664,37,"Rochester, NY"
-77068,38,"Sacramento, CA"
-78499,39,"Salt Lake City-West Valley City, UT"
-78580,40,"San Antonio, TX"
-78661,41,"San Diego, CA"
-78904,42,"San Francisco-Oakland, CA"
-79039,43,"San Jose, CA"
-80389,44,"Seattle, WA"
-83764,45,"Spokane, WA"
-77770,46,"St. Louis, MO-IL"
-86599,47,"Tampa-St. Petersburg, FL"
-88732,48,"Tucson, AZ"
-90892,49,"Virginia Beach, VA"
-92242,50,"Washington, DC-VA-MD"
+GEOID10,order,metro_area,fips
+10162,1,"Bridgeport-Stamford, CT-NY",9001
+11350,2,"Buffalo, NY",36029
+15670,3,"Charlotte, NC-SC",37119
+16264,4,"Chicago, IL-IN",17031
+16885,5,"Cincinnati, OH-KY-IN",39061
+17668,6,"Cleveland, OH",39035
+19234,7,"Columbus, OH",39049
+22042,8,"Dallas-Fort Worth-Arlington, TX",48113
+22528,9,"Dayton, OH",39113
+23527,10,"Denver-Aurora, CO",8031
+23824,11,"Detroit, MI",26163
+25228,12,"Durham, NC",37063
+31843,13,"Fresno, CA",6019
+37243,14,"Hartford, CT",9003
+89770,15,"Honolulu, HI",15003
+40429,16,"Houston, TX",48201
+41212,17,"Indianapolis, IN",18097
+42346,18,"Jacksonville, FL",12031
+47995,19,"Las Vegas-Henderson, NV",32003
+51445,20,"Los Angeles-Long Beach-Anaheim, CA",6037
+51755,21,"Louisville/Jefferson County, KY-IN",21111
+56602,22,"Miami, FL",12086
+57466,23,"Milwaukee, WI",55079
+57628,24,"Minneapolis-St. Paul, MN-WI",27053
+62407,25,"New Haven, CT",9009
+62677,26,"New Orleans, LA",22071
+63217,27,"New York-Newark, NY-NJ-CT",1
+65863,28,"Orlando, FL",12095
+69076,29,"Philadelphia, PA-NJ-DE-MD",42101
+69184,30,"Phoenix-Mesa, AZ",4013
+69697,31,"Pittsburgh, PA",42003
+71317,32,"Portland, OR-WA",41051
+72505,33,"Providence, RI-MA",44007
+74179,34,"Reno, NV-CA",32031
+74746,35,"Richmond, VA",51760
+75340,36,"Riverside-San Bernardino, CA",6065
+75664,37,"Rochester, NY",36055
+77068,38,"Sacramento, CA",6067
+78499,39,"Salt Lake City-West Valley City, UT",49035
+78580,40,"San Antonio, TX",48029
+78661,41,"San Diego, CA",6073
+78904,42,"San Francisco-Oakland, CA",6075
+79039,43,"San Jose, CA",6085
+80389,44,"Seattle, WA",53033
+83764,45,"Spokane, WA",53063
+77770,46,"St. Louis, MO-IL",29189
+86599,47,"Tampa-St. Petersburg, FL",12057
+88732,48,"Tucson, AZ",4019
+90892,49,"Virginia Beach, VA",51810
+92242,50,"Washington, DC-VA-MD",11001
