@@ -4,7 +4,7 @@
 <head>
   <!-- Basic Page Needs -->
   <meta charset="utf-8">
-  <title>Transportation policy</title>
+  <title>Transit Ridership During COVID-19</title>
   <meta name="description" content="">
   <meta name="author" content="">
 
@@ -44,18 +44,22 @@
     }
 
     #map {   
-      position: fixed; 
-      width: 100%;
-      height: 100%;
+      position: fixed;       
+      width: 90%;
+      height: 90%;
+      top: 56px;
+      left: 200px;
+      right: 100px; 
+      bottom: 100px;
       margin: 0;
       padding: 0;
     }
-    #selectMetro {
-      position: fixed;
-      background-color: rgb(173, 220, 241);
-      top: 90%;
-    }
 
+    #metroExplore {
+      position: fixed;
+      left: 350px;
+      bottom: 30px;
+    }
   </style>
 
 </head>
@@ -86,135 +90,146 @@
 
   <!-- Sidebar -->
   <div class="container-fluid">
-    <div class="row">
-      <nav id="sidebarMenu" class="col d-md-block bg-light sidebar collapse">
-        <div class="sidebar-sticky pt-3">
-          <ul class="nav flex-column px-4">
-            <li class="nav-item py-1 my-1">              
-              <h6>Month</h6>
-              <select class="selectpicker" id= "month-select"  multiple data-live-search="true">
-              </select>              
-            </li>
-            <li class="nav-item py-1 my-1">              
-              <h6>Mode(s)</h6>
-              <select class="selectpicker" multiple  data-live-search="true">
-                <option>Bus</option>
-                <option>Trolleybus</option>
-                <option>Commuter Bus</option>
-                <option>Bus Rapid Transit</option>
-                <option>Commuter Rail</option>
-                <option>Light Rail</option>
-                <option>Heavy Rail</option>
-                <option>Hybrid Rail</option>
-                <option>Inclined Plane</option>
-                <option>Monorail/Automated</option>
-                <option>Streetcar</option>
-                <option>Cable Car</option>
-                <option>Publico</option>
-                <option>Demand Response</option>
-                <option>Vanpool</option>
-                <option>Ferryboat</option>
-                <option>Aerial Tramway</option>
-              </select>              
-            </li>
-            <li class="nav-item py-1 my-1">              
-              <h6 class="my-3">Add an Overlay</h6>
-              <div class="ml-2">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="COVIDCases" id="COVIDCases" value="COVIDCases" checked>
-                  <label class="form-check-label" for="COVIDCases">
-                    COVID Cases
-                  </label>
-                </div>
-                <div class="form-check mb-3">
-                  <input class="form-check-input" type="checkbox" name="COVIDDeaths" id="COVIDDeaths" value="COVIDDeaths">
-                  <label class="form-check-label" for="COVIDDeaths">
-                    COVID Deaths
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="popDensity" id="popDensity" value="popDensity">
-                  <label class="form-check-label" for="popDensity">
-                    Population Density
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="HHIncome" id="HHIncome" value="HHIncome">
-                  <label class="form-check-label" for="HHIncome">
-                    Household Income
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="mode" id="mode" value="mode">
-                  <label class="form-check-label" for="mode">
-                    % Public Transit Primary Mode to Work
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="renters" id="renters" value="renters">
-                  <label class="form-check-label" for="renters">
-                    % Renters
-                  </label>
-                </div>      
+    <nav id="sidebarMenu" class="d-md-block bg-light sidebar collapse">
+      <div class="sidebar-sticky pt-3">
+        <ul class="nav flex-column px-4">
+          <li class="nav-item py-1 my-1">              
+            <h6>Month</h6>
+            <select class="selectpicker" id= "month-select"  multiple data-live-search="true">
+            </select>              
+          </li>
+          <li class="nav-item py-1 my-1">              
+            <h6>Mode(s)</h6>
+            <select id="mode-select" class="selectpicker" multiple  data-live-search="true">
+              <option>Bus</option>
+              <option>Trolleybus</option>
+              <option>Commuter Bus</option>
+              <option>Bus Rapid Transit</option>
+              <option>Commuter Rail</option>
+              <option>Light Rail</option>
+              <option>Heavy Rail</option>
+              <option>Hybrid Rail</option>
+              <option>Inclined Plane</option>
+              <option>Monorail/Automated</option>
+              <option>Streetcar</option>
+              <option>Cable Car</option>
+              <option>Publico</option>
+              <option>Demand Response</option>
+              <option>Vanpool</option>
+              <option>Ferryboat</option>
+              <option>Aerial Tramway</option>
+            </select>              
+          </li>
+          <li class="nav-item py-1 my-1">              
+            <h6 class="my-3">Add an Overlay</h6>
+            <div class="ml-2">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="COVIDCases" id="COVIDCases" value="COVIDCases" checked>
+                <label class="form-check-label" for="COVIDCases">
+                  COVID Cases
+                </label>
               </div>
-                    
-            </li>
-  
-          </ul>
-         
-          <div id="exportBtn" class="d-flex justify-content-end align-items-end mr-5 mb-1">
-            <button class="btn btn-link-secondary  btn-sm">Export Data <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-download" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd" d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-              <path fill-rule="evenodd" d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
-            </svg></button>
-          </div>                
-        </div>
-      </nav>
-      <div id="map" class="col-auto"></div>
+              <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" name="COVIDDeaths" id="COVIDDeaths" value="COVIDDeaths">
+                <label class="form-check-label" for="COVIDDeaths">
+                  COVID Deaths
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="popDensity" id="popDensity" value="popDensity">
+                <label class="form-check-label" for="popDensity">
+                  Population Density
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="HHIncome" id="HHIncome" value="HHIncome">
+                <label class="form-check-label" for="HHIncome">
+                  Household Income
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="mode" id="mode" value="mode">
+                <label class="form-check-label" for="mode">
+                  % Public Transit Primary Mode to Work
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="renters" id="renters" value="renters">
+                <label class="form-check-label" for="renters">
+                  % Renters
+                </label>
+              </div>      
+            </div>
+                  
+          </li>
 
-      <!-- <div id="map" class="col-auto">
-        <div id="map" class="mapboxgl-map">
-          <div class="mapboxgl-canary" style="visibility: hidden;"></div>
-          <div class="mapboxgl-canvas-container mapboxgl-interactive mapboxgl-touch-drag-pan mapboxgl-touch-zoom-rotate">
-            <canvas class="mapboxgl-canvas" tabindex="0" aria-label="Map" width="1290" height="916" style="position: absolute; width: 1126px; height: 800px;"></canvas>
-          </div>
-          <div class="mapboxgl-control-container">
-            <div class="mapboxgl-ctrl-top-left"></div>
-            <div class="mapboxgl-ctrl-top-right"></div>
-            <div class="mapboxgl-ctrl-bottom-left">
-              <div class="mapboxgl-ctrl" style="display: block;">
-                <a class="mapboxgl-ctrl-logo" target="_blank" rel="noopener nofollow" href="https://www.mapbox.com/" aria-label="Mapbox logo"></a>
-              </div>
+        </ul>
+        
+        <div id="exportBtn" class="d-flex justify-content-end align-items-end mr-5 mb-1">
+          <button class="btn btn-link-secondary  btn-sm">Export Data <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-download" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+            <path fill-rule="evenodd" d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+          </svg></button>
+        </div>                
+      </div>
+    </nav>
+
+    <!-- Map -->
+    <div id="map"></div>
+
+    <!-- Select metro area -->
+    <div id="metroExplore">
+      <h6>Explore Metro Area Detail:</h6>
+      <select class="selectpicker" id= "metro-select" data-live-search="true" data-width="500px">
+      </select> 
+      <button id="exploreBtn" class="btn btn-dark">Export Data ></button> 
+    </div>
+
+
+
+    <!-- <div id="map" class="col-auto">
+      <div id="map" class="mapboxgl-map">
+        <div class="mapboxgl-canary" style="visibility: hidden;"></div>
+        <div class="mapboxgl-canvas-container mapboxgl-interactive mapboxgl-touch-drag-pan mapboxgl-touch-zoom-rotate">
+          <canvas class="mapboxgl-canvas" tabindex="0" aria-label="Map" width="1290" height="916" style="position: absolute; width: 1126px; height: 800px;"></canvas>
+        </div>
+        <div class="mapboxgl-control-container">
+          <div class="mapboxgl-ctrl-top-left"></div>
+          <div class="mapboxgl-ctrl-top-right"></div>
+          <div class="mapboxgl-ctrl-bottom-left">
+            <div class="mapboxgl-ctrl" style="display: block;">
+              <a class="mapboxgl-ctrl-logo" target="_blank" rel="noopener nofollow" href="https://www.mapbox.com/" aria-label="Mapbox logo"></a>
             </div>
-            <div class="mapboxgl-ctrl-bottom-right">
-              <div class="mapboxgl-ctrl mapboxgl-ctrl-attrib">
-                <div class="mapboxgl-ctrl-attrib-inner">
-                  <a href="https://www.mapbox.com/about/maps/" target="_blank">© Mapbox</a> 
-                  <a href="http://www.openstreetmap.org/about/" target="_blank">© OpenStreetMap</a> 
-                </div>
+          </div>
+          <div class="mapboxgl-ctrl-bottom-right">
+            <div class="mapboxgl-ctrl mapboxgl-ctrl-attrib">
+              <div class="mapboxgl-ctrl-attrib-inner">
+                <a href="https://www.mapbox.com/about/maps/" target="_blank">© Mapbox</a> 
+                <a href="http://www.openstreetmap.org/about/" target="_blank">© OpenStreetMap</a> 
               </div>
             </div>
           </div>
         </div>
-        <div id="mapInfo">USA <span></span> <br> Transit Ridership <br> <span></span></div>
-      </div> -->
-    </div>
+      </div>
+      <div id="mapInfo">USA <span></span> <br> Transit Ridership <br> <span></span></div>
+    </div> -->
   </div>
+
+
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
+
 <script>
-  // var mapInfo= document.querySelectorAll('#mapInfo span');
+  // Overlay check boxs group
   $('input[type="checkbox"]').on('change', function() {
     $('input[type="checkbox"]').not(this).prop('checked', false);
-    // if (this.is(":checked")) {
-    //   mapInfo[1].innerText = this.nextElementSibling().innerText;
-    // }     
+    if (this.is(":checked")) {
+      var overlaySelect = this.nextElementSibling();
+    }     
   });
-
-  // $('month-select').on('change', function() {
-  //   mapInfo[0].innerText = this.title;   
-  // });
+  var modeSelect = document.querySelector('#mode-select');
+  var monthSelect = document.querySelector('#month-select');
 
   anychart.onDocumentReady(function () {
 
@@ -247,15 +262,15 @@
     //set series geo id field settings
     series.labels().format("{%id}");
 
-    series.tooltip().format("{%size} thousands of tourists");
+    series.tooltip().format("{%size} trips");
 
     series.tooltip().titleFormat("{%id}");
 
-    map.title("Most popluar places \n of touristic interest in 2013");
+    map.title("National Transit Ridership");
 
     // change the bubble max size
-    map.maxBubbleSize(45);
-    map.minBubbleSize(15);
+    map.maxBubbleSize(30);
+    map.minBubbleSize(2);
 
     // set container id for the chart
     map.container('map');
