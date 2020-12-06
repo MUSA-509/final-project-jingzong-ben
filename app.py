@@ -41,7 +41,11 @@ with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-c
     counties = json.load(response)
 
 #Establish query parameters---------------------------------------------------------------------------------------------------------
+areaList = pd.unique(top50['metro_area']).tolist()
+json_string = json.dumps(areaList)
 
+monthList = pd.unique(ridership['month']).tolist()
+print(monthList)
 
 #Sidebar----------------------------------------------------------------------------------------------------------------------------
 ##get select_date from dropdown

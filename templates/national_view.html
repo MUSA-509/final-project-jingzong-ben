@@ -76,8 +76,8 @@
           </a>
           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navDropdown">
             <a class="dropdown-item" href="https://www.transit.dot.gov/ntd/data-product/monthly-module-adjusted-data-release">National Transit Database</a>
-            <a class="dropdown-item" href="https://www.census.gov/data/developers/data-sets/acs-1year.html">ACS 1-year Estimates (2019)</a>
-            <a class="dropdown-item" href="https://github.com/CSSEGISandData/COVID-19">COVID-19 Data Repo</a>
+            <a class="dropdown-item" href="https://www.census.gov/programs-surveys/acs">ACS 5-year Estimates (2018)</a>
+            <a class="dropdown-item" href="https://github.com/nytimes/covid-19-data">The New York Times COVID-19 Repo</a>
           </div>
         </li>        
       </ul>
@@ -95,46 +95,33 @@
             </select>              
           </li>
           <li class="nav-item py-1 my-1">              
-            <h6>Mode(s)</h6>
+            <h6>Modes</h6>
             <select id="mode-select" class="selectpicker" multiple  data-live-search="true">
-              <option>Bus</option>
-              <option>Trolleybus</option>
-              <option>Commuter Bus</option>
-              <option>Bus Rapid Transit</option>
-              <option>Commuter Rail</option>
-              <option>Light Rail</option>
-              <option>Heavy Rail</option>
-              <option>Hybrid Rail</option>
-              <option>Inclined Plane</option>
-              <option>Monorail/Automated</option>
-              <option>Streetcar</option>
-              <option>Cable Car</option>
-              <option>Publico</option>
-              <option>Demand Response</option>
-              <option>Vanpool</option>
-              <option>Ferryboat</option>
-              <option>Aerial Tramway</option>
+              <option>Rail</option>
+              <option>Non-Rail</option>
             </select>              
           </li>
           <li class="nav-item py-1 my-1">              
             <h6 class="my-3">Add an Overlay</h6>
+            <h7 class="my-3">COVID-19</h7>
             <div class="ml-2">
               <div class="form-check">
                 <input class="form-check-input" type="checkbox" name="COVIDCases" id="COVIDCases" value="COVIDCases" checked>
                 <label class="form-check-label" for="COVIDCases">
-                  COVID Cases
+                  Cases
                 </label>
               </div>
               <div class="form-check mb-3">
                 <input class="form-check-input" type="checkbox" name="COVIDDeaths" id="COVIDDeaths" value="COVIDDeaths">
                 <label class="form-check-label" for="COVIDDeaths">
-                  COVID Deaths
+                  Deaths
                 </label>
               </div>
+              <h7 class="my-3">ACS 5-yr Estimates (2018)</h7>
               <div class="form-check">
                 <input class="form-check-input" type="checkbox" name="popDensity" id="popDensity" value="popDensity">
                 <label class="form-check-label" for="popDensity">
-                  Population Density
+                  Population
                 </label>
               </div>
               <div class="form-check">
@@ -144,15 +131,21 @@
                 </label>
               </div>
               <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="mode" id="mode" value="mode">
-                <label class="form-check-label" for="mode">
-                  % Public Transit Primary Mode to Work
+                <input class="form-check-input" type="checkbox" name="noveh" id="noveh" value="noveh">
+                <label class="form-check-label" for="noveh">
+                  % Households with No Access to a Vehicle
                 </label>
               </div>
               <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="renters" id="renters" value="renters">
-                <label class="form-check-label" for="renters">
-                  % Renters
+                <input class="form-check-input" type="checkbox" name="transit" id="transit" value="transit">
+                <label class="form-check-label" for="transit">
+                  % Workers Commuting on Public Transit
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="service" id="service" value="service">
+                <label class="form-check-label" for="service">
+                  % Workers in Service Occupations
                 </label>
               </div>      
             </div>
@@ -175,10 +168,10 @@
 
     <!-- Select metro area -->
     <div id="metroExplore">
-      <h6>Explore Metro Area Detail:</h6>
+      <h6>Explore a Metro Area:</h6>
       <select class="selectpicker" id= "area-select" data-live-search="true" data-width="500px">
       </select> 
-      <button id="exploreBtn" class="btn btn-dark">Export Data ></button> 
+      <button id="exploreBtn" class="btn btn-dark">Explore ></button> 
     </div>
 
 
@@ -237,14 +230,15 @@
     // Populate month options. 
     // var monthList = {{ month_list }};    
     // var selectedMonth = {{ selected_month }}; 
-    var monthList = ['01', '02', '03']; // test
+    var monthList = ['2019-01', '2019-02', '2019-03', '2019-04', '2019-05', '2019-06', '2019-07', '2019-08', '2019-09', '2019-10', '2019-11', '2019-12', '2020-01', '2020-02', '2020-03', '2020-04', '2020-05', '2020-06', '2020-07', '2020-08', '2020-09']; // test
     var selectedMonth = null; // test
     populateOptions($('#month-select'), monthList);
 
     // Populate metro area options   
     // var areaList = {{ metro_area_list }};
     // var selectedArea = {{ selected_area }};
-    var areaList = ['01', '02', '03']; // test
+    var areaList = ['Bridgeport-Stamford, CT-NY', 'Buffalo, NY', 'Charlotte, NC-SC', 'Chicago, IL-IN', 'Cincinnati, OH-KY-IN', 'Cleveland, OH', 'Columbus, OH', 'Dallas-Fort Worth-Arlington, TX', 'Dayton, OH', 'Denver-Aurora, CO', 'Detroit, MI', 'Durham, NC', 'Fresno, CA', 'Hartford, CT', 'Honolulu, HI', 'Houston, TX', 'Indianapolis, IN', 'Jacksonville, FL', 'Las Vegas-Henderson, NV', 'Los Angeles-Long Beach-Anaheim, CA', 'Louisville/Jefferson County, KY-IN', 'Miami, FL', 'Milwaukee, WI', 
+'Minneapolis-St. Paul, MN-WI', 'New Haven, CT', 'New Orleans, LA', 'New York-Newark, NY-NJ-CT', 'Orlando, FL', 'Philadelphia, PA-NJ-DE-MD', 'Phoenix-Mesa, AZ', 'Pittsburgh, PA', 'Portland, OR-WA', 'Providence, RI-MA', 'Reno, NV-CA', 'Richmond, VA', 'Riverside-San Bernardino, CA', 'Rochester, NY', 'Sacramento, CA', 'Salt Lake City-West Valley City, UT', 'San Antonio, TX', 'San Diego, CA', 'San Francisco-Oakland, CA', 'San Jose, CA', 'Seattle, WA', 'Spokane, WA', 'St. Louis, MO-IL', 'Tampa-St. Petersburg, FL', 'Tucson, AZ', 'Virginia Beach, VA', 'Washington, DC-VA-MD']; // test
     var selectedArea = null; // test
     populateOptions($('#area-select'), areaList);
     
