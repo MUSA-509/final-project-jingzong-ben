@@ -181,34 +181,6 @@
       <button id="exploreBtn" class="btn btn-dark">Export Data ></button> 
     </div>
 
-
-
-    <!-- <div id="map" class="col-auto">
-      <div id="map" class="mapboxgl-map">
-        <div class="mapboxgl-canary" style="visibility: hidden;"></div>
-        <div class="mapboxgl-canvas-container mapboxgl-interactive mapboxgl-touch-drag-pan mapboxgl-touch-zoom-rotate">
-          <canvas class="mapboxgl-canvas" tabindex="0" aria-label="Map" width="1290" height="916" style="position: absolute; width: 1126px; height: 800px;"></canvas>
-        </div>
-        <div class="mapboxgl-control-container">
-          <div class="mapboxgl-ctrl-top-left"></div>
-          <div class="mapboxgl-ctrl-top-right"></div>
-          <div class="mapboxgl-ctrl-bottom-left">
-            <div class="mapboxgl-ctrl" style="display: block;">
-              <a class="mapboxgl-ctrl-logo" target="_blank" rel="noopener nofollow" href="https://www.mapbox.com/" aria-label="Mapbox logo"></a>
-            </div>
-          </div>
-          <div class="mapboxgl-ctrl-bottom-right">
-            <div class="mapboxgl-ctrl mapboxgl-ctrl-attrib">
-              <div class="mapboxgl-ctrl-attrib-inner">
-                <a href="https://www.mapbox.com/about/maps/" target="_blank">© Mapbox</a> 
-                <a href="http://www.openstreetmap.org/about/" target="_blank">© OpenStreetMap</a> 
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id="mapInfo">USA <span></span> <br> Transit Ridership <br> <span></span></div>
-    </div> -->
   </div>
 
 
@@ -220,14 +192,14 @@
   // If there is no default option, select first one.
   function setDefaultOpt(select, defaultOpt){
     if (defaultOpt == null) defaultOpt = select[0].firstElementChild.innerText;
-    console.log(select[0].firstElementChild.innerText);
+    
     select.selectpicker('val', defaultOpt);    
   }
   
   // Populate options from list.
   function populateOptions(select, optionList, defaultOpt) {
-    for(var optionText in optionList){
-      select.append('<option value="'+optionText+'">'+optionText+'</option>');;      
+    for(var i = 0; i < optionList.length; i++){
+      select.append('<option value="'+optionList[i]+'">'+optionList[i]+'</option>');;      
     }  
     select.selectpicker("refresh"); 
     setDefaultOpt(select, defaultOpt);
@@ -244,7 +216,7 @@
     // Populate metro area options   
     // var areaList = {{ metro_area_list }};
     // var selectedArea = {{ selected_area }};
-    var areaList = ['01', '02', '03']; // test
+    var areaList = ["area", 'area', 'area','area','area']; // test
     var selectedArea = null; // test
     populateOptions($('#area-select'), areaList);
     
