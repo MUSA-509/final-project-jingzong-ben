@@ -13,6 +13,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from urllib.request import urlopen
 import json
+import requests
 
 #Load data--------------------------------------------------------------------------------------------------------------------------
 top50 = pd.read_csv("Data/top50.csv")
@@ -39,20 +40,11 @@ covid = bqclient.query(query_c).to_dataframe()
 
 with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json') as response:
     counties = json.load(response)
-
-#Establish query parameters---------------------------------------------------------------------------------------------------------
-areaList = pd.unique(top50['metro_area']).tolist()
-json_string = json.dumps(areaList)
-
-monthList = pd.unique(ridership['month']).tolist()
-print(monthList)
-
+         
 #Sidebar----------------------------------------------------------------------------------------------------------------------------
-##get select_date from dropdown
-##get select_mode from dropdown
-select_date = "2020-09"
-select_classification = "Non-Rail"
-select_metric = (["cases"])
+select_date = # insert selectedMonth from dropdown?
+select_classification = # insert selectedModes from dropdown?
+select_metric = # insert overlaySelect from list?
 
 #Landing Page Map-------------------------------------------------------------------------------------------------------------------
 ridership_agg = ridership[ridership["month"] == select_date]
@@ -75,6 +67,7 @@ fig.update_layout(
 )
 fig.write_html("map.html")
 
+#if metro equals covid then 
 #fig2 = px.choropleth(census, geojson=counties, locations='fips', color='service',
 #                           color_continuous_scale="Viridis",
 #                           range_color=(0, 12),
@@ -85,8 +78,8 @@ fig.write_html("map.html")
 #fig2.show()
 #fig2.write_html("map2.html")
 
-select_metro = "Philadelphia, PA-NJ-DE-MD"
 #Metro Detail-----------------------------------------------------------------------------------------------------------------------
+select_metro = # insert selectedArea from dropdown
 
 #Ridership graph
 ridership_s = ridership[ridership["metro_area"] == select_metro]
