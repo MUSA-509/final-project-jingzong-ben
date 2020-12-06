@@ -14,12 +14,14 @@ import plotly.graph_objects as go
 from urllib.request import urlopen
 import json
 
-#Establish query connection---------------------------------------------------------------------------------------------------------
+#Load data--------------------------------------------------------------------------------------------------------------------------
+top50 = pd.read_csv("Data/top50.csv")
+
+census = pd.read_csv("Data/census.csv",
+                   dtype={"fips": str})
+
 bqclient = bigquery.Client.from_service_account_json('C:/Users/bennd/Documents/MUSA509/TransitPolicyApp-99838a65a6ed.json')
 pd.set_option('mode.chained_assignment', None)
-
-#Load data--------------------------------------------------------------------------------------------------------------------------
-top50 = pd.read_csv("data/top50.csv")
 
 query_r = f"""
     SELECT metro_area, area_land, area_water, GEOID10, mode, month, trips, classification, lat, lon
@@ -28,11 +30,22 @@ query_r = f"""
 """
 ridership = bqclient.query(query_r).to_dataframe()
 
+query_c = f"""
+    SELECT date, county, state_name, county_fips_code, confirmed_cases, deaths
+    FROM `bigquery-public-data.covid19_nyt.us_counties`
+    GROUP BY date, county, state_name, county_fips_code, confirmed_cases, deaths
+"""
+covid = bqclient.query(query_c).to_dataframe()
+
 with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json') as response:
     counties = json.load(response)
 
 #Establish query parameters---------------------------------------------------------------------------------------------------------
+areaList = pd.unique(top50['metro_area']).tolist()
+json_string = json.dumps(areaList)
 
+monthList = pd.unique(ridership['month']).tolist()
+print(monthList)
 
 #Sidebar----------------------------------------------------------------------------------------------------------------------------
 ##get select_date from dropdown
@@ -62,6 +75,16 @@ fig.update_layout(
 )
 fig.write_html("map.html")
 
+#fig2 = px.choropleth(census, geojson=counties, locations='fips', color='service',
+#                           color_continuous_scale="Viridis",
+#                           range_color=(0, 12),
+#                           scope="usa",
+#                           labels={'service':'service occupations'}
+#                          )
+#fig2.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+#fig2.show()
+#fig2.write_html("map2.html")
+
 select_metro = "Philadelphia, PA-NJ-DE-MD"
 #Metro Detail-----------------------------------------------------------------------------------------------------------------------
 
@@ -75,41 +98,42 @@ chart_ridership = alt.Chart(ridership_s).mark_area().encode(
 ).interactive()
 chart_ridership.save('chart_ridership.html')
 
-#search_county = "San Francisco"
-#covid_s = covid[covid["county"] == search_county]
-#covid_s['new_cases'] = covid_s['cases'].diff()
-#covid_s['new_deaths'] = covid_s['deaths'].diff()
-#covid_s['cases_avg'] = covid_s.iloc[:,6].rolling(window=7).mean()
-#covid_s['deaths_avg'] = covid_s.iloc[:,7].rolling(window=7).mean()
-#covid_s['DateTime'] = pd.to_datetime(covid_s['date'])
+fips_select = "06075"
+covid_s = covid[covid["county_fips_code"] == fips_select]
+covid_s['new_cases'] = covid_s['confirmed_cases'].diff()
+covid_s['new_deaths'] = covid_s['deaths'].diff()
+covid_s['cases_avg'] = covid_s.iloc[:,6].rolling(window=7).mean()
+covid_s['deaths_avg'] = covid_s.iloc[:,7].rolling(window=7).mean()
+covid_s['date'] = covid_s['date'].astype(str)
 
 #Covid Cases graph
-#chart_cases = alt.Chart(covid_s).mark_bar().encode(
-#    x=alt.X('date:T', axis=alt.Axis(title='Month')),
-#    y=alt.Y('cases_avg:Q', axis=alt.Axis(title='New COVID-19 Cases Reported')),
-#)
-#chart_cases.save('chart_cases.html')
+chart_cases = alt.Chart(covid_s).mark_bar().encode(
+    x=alt.X('date', axis=alt.Axis(title='Month')),
+    y=alt.Y('cases_avg:Q', axis=alt.Axis(title='New COVID-19 Cases Reported')),
+)
+chart_cases.save('chart_cases.html')
 
 #Covid deaths graph
-#chart_deaths = alt.Chart(covid_s).mark_bar().encode(
-#    x=alt.X('date:T', axis=alt.Axis(title='Month')),
-#    y=alt.Y('deaths_avg:Q', axis=alt.Axis(title='New COVID-19 Deaths Reported')),
-#    color=alt.value('orange'),
-#)
-#chart_deaths.save('chart_deaths.html')
+chart_deaths = alt.Chart(covid_s).mark_bar().encode(
+    x=alt.X('date', axis=alt.Axis(title='Month')),
+    y=alt.Y('deaaths_avg:Q', axis=alt.Axis(title='New COVID-19 Deaths Reported')),
+)
+chart_cases.save('chart_deaths.html')
 
 #Comparison scatter plot
-#top50_c = top50.merge(covid_l, on="fips", how='left')
-#ridership_agg = ridership_agg[['GEOID10','trips']]
-#top50_c = top50_c.merge(ridership_agg, on="GEOID10", how='left')
+covid_l = covid[covid["date"] == "2020-11-30"]
+covid_l['fips'] = covid_l['county_fips_code']
+top50_c = top50.merge(covid_l, on="fips", how='left')
+ridership_agg = ridership_agg[['GEOID10','trips']]
+top50_c = top50_c.merge(ridership_agg, on="GEOID10", how='left')
 
-#chart_scatter = alt.Chart(top50_c).mark_circle(size=200).encode(
-#    x=alt.X('cases', axis=alt.Axis(title='COVID-19 Cases (Cumulative)')),
-#    y=alt.Y('trips', axis=alt.Axis(title='Total Transit Trips in September 2020')),
-#    color=alt.Color('state', legend=None),
-#    tooltip=['metro_area', 'cases', 'deaths', 'trips']
-#).interactive()
-#chart_scatter.save('scatter.html')
+chart_scatter = alt.Chart(top50_c).mark_circle(size=200).encode(
+    x=alt.X('confirmed_cases', axis=alt.Axis(title='COVID-19 Cases (Cumulative)')),
+    y=alt.Y('trips', axis=alt.Axis(title='Total Transit Trips in September 2020')),
+    #color=alt.Color('state', legend=None),
+    tooltip=['metro_area', 'confirmed_cases', 'deaths', 'trips']
+).interactive()
+chart_scatter.save('scatter.html')
 
 #Census statistics table
 top50_m = pd.melt(top50, id_vars='metro_area', value_vars=['pop_18', 'hh_size', 'hh_income', 'rent_share', 'pt_share', 'service_share'])
