@@ -161,9 +161,7 @@
 
   $( document ).ready(function() {
     // Set default metro area option
-    var selectedArea = {{ selected_area|tojson }};
-    setDefaultOpt($('#area-select'), selectedArea);
-
+    $('#area-select').selectpicker('val', {{ selected_area|tojson }});
 
 
     // Populate metro table
