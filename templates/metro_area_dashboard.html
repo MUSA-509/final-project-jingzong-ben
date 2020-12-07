@@ -21,6 +21,18 @@
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
   <!-- Favicon -->
   <!-- <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}"> -->
+  <style>
+    .chart{
+      padding-top: 20px;
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+  </style>
+
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega@5"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-lite@4.8.1"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-embed@6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 </head>
 <body>
@@ -41,7 +53,7 @@
           </span>            
         </a>
         <li class="nav-item ml-3">
-          <button class = "btn btn-gray btn-sm">Back to National View</button>
+          <a class="btn btn-secondary" href="file:///C:/0_MUSA509/finalProject/final-project-jingzong-ben/templates/national_view.html" role="button">Back to National View</a>
         </li>        
       </ul>
     </div>
@@ -49,29 +61,67 @@
 
   <div class="container-fluid">
     <div class="row justify-content-center align-items-center m-2">
-      <div class="col-lg-5 col-8 p-5">
+      <div class="col-lg-5 col-8 chart">
         <h5>Explore Metro Area Detail:</h5>
-        <select class="selectpicker" id= "area-select" data-live-search="true" data-width="350px">
-        </select>
-        <button id="exploreBtn" class="btn btn-dark">Explore ></button> 
-        <!-- replace h2 with chart or table-->
-        <h2>ACS Table</h2>
+        <form action="" method="GET">
+          <select class="selectpicker" name="select_area" id= "area-select" data-live-search="true" data-width="350px">
+            {% for area in area_list %} 
+              <option value= {{ area }}>{{ area }}</option>
+            {% endfor %} 
+          </select>
+          <button type="submit" id="exploreBtn" class="btn btn-dark">Explore ></button> 
+        </form>
+                
+        <table id="metro_table" class="table table-light m-3">
+          <tbody>
+            <tr>
+              <th scope="row">Population (2018)</th>
+              <td>10098052</td>
+            </tr>
+            <tr>
+              <th scope="row">Avg. Household Size</td>
+              <td>3</td>
+            </tr>
+            <tr>
+              <th scope="row">Median Household Income</th>
+              <td>64251</td>
+            </tr>
+            <tr>
+              <th scope="row">Renter-occupied housing units</th>
+              <td>54%</td>
+            </tr>
+            <tr>
+              <th scope="row">Primary Mode to Work: Public Transit</th>
+              <td>6%</td>
+            </tr>
+            <tr>
+              <th scope="row">Workers in Service Occupations</th>
+              <td>19%</td>
+            </tr>
+          </tbody>
+        </table>
       </div>        
-      <div class="col-lg-7 col-8 p-5">
+      <div class="col-lg-7 col-8 chart">
         <!-- replace h2 with chart or table-->
-        <h2>Ridership by Mode</h2>
+        <div id="ridership">
+          {% include 'chart_ridership.html' %}
+        </div>
+        
       </div>
-      <div class="col-lg-5 col-8 p-5">
+      <div class="col-lg-5 col-8 chart">
         <!-- replace h2 with chart or table-->
         <h2>Scatterplot</h2>
+        <div class="scatter">
+          <!-- {% include 'scatter.html' %} -->
+        </div>
       </div>
-      <div class="col-lg-7 col-8 p-5">
+      <div class="col-lg-7 col-8 chart">
         <!-- replace h2 with chart or table-->
         <div class="row justify-content-center align-items-center">
-          <div class="col-10 col-lg-6 p-2">
+          <div class="col-10 col-lg-6 chart">
             <h2>COVID-19 Cases</h2>
           </div>
-          <div class="col-10 col-lg-6 p-2">
+          <div class="col-10 col-lg-6 chart">
             <h2>COVID-19 Deaths</h2>
           </div>
         </div>
@@ -90,21 +140,36 @@
     select.selectpicker('val', defaultOpt);    
   }
   // Populate options from list.
-  function populateOptions(select, optionList, defaultOpt) {
-    for(var i = 0; i < optionList.length; i++){
-      select.append('<option value="'+optionList[i]+'">'+optionList[i]+'</option>');;      
-    }  
-    select.selectpicker("refresh"); 
-    setDefaultOpt(select, defaultOpt);
+  // function populateOptions(select, optionList, defaultOpt) {
+  //   for(var i = 0; i < optionList.length; i++){
+  //     select.append('<option value="'+optionList[i]+'">'+optionList[i]+'</option>');;      
+  //   }  
+  //   select.selectpicker("refresh"); 
+  //   setDefaultOpt(select, defaultOpt);
+  // }
+
+  // Populate metro table from list.
+  function populateTable(tableID, data) {
+    for(var i = 1; data[i-1] != null; i++){
+      try {
+        $('#'+tableID+' tr:nth-child('+i+') td').first().text(data[i-1]);
+      } catch(e) {
+        console.log(e);
+      }
+    }
   }
 
   $( document ).ready(function() {
-    // Populate metro area options   
-    // var areaList = {{ metro_area_list }};
-    // var selectedArea = {{ selected_area }};
-    var areaList = ['01', '02', '03']; // test
-    var selectedArea = null; // test
-    populateOptions($('#area-select'), areaList, selectedArea);
+    // Set default metro area option
+    var selectedArea = {{ selected_area|tojson }};
+    setDefaultOpt($('#area-select'), selectedArea);
+
+
+
+    // Populate metro table
+    // var tableData = {{ table_data }};
+    populateTable('metro_table', {{ table_data|tojson }});    
+
   }); 
 </script>
 
