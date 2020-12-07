@@ -1,6 +1,7 @@
 #Transport Policy App
 
 #Packages---------------------------------------------------------------------------------------------------------------------------
+from flask import Flask, Response, render_template, escape, request, url_for
 import pandas as pd
 import altair as alt
 from google.cloud import bigquery
@@ -16,6 +17,50 @@ import json
 import requests
 
 #Load data--------------------------------------------------------------------------------------------------------------------------
+top50 = pd.read_csv("Data/top50.csv")
+
+census = pd.read_csv("Data/census.csv",
+                   dtype={"fips": str})
+
+bqclient = bigquery.Client.from_service_account_json('C:/Users/bennd/Documents/MUSA509/TransitPolicyApp-99838a65a6ed.json')
+pd.set_option('mode.chained_assignment', None)
+app = Flask(__name__, template_folder="templates")
+
+with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json') as response:
+    counties = json.load(response)
+         
+#Metro Detail-----------------------------------------------------------------------------------------------------------------------
+@app.route("/metro/")
+def metro_areas():
+    metro_area = request.args.get("selectedArea")
+    query = (
+        'SELECT metro_area, month, mode, trips'
+        'FROM `transitpolicyapp.ridership.Ridership`'
+        'WHERE metro_area = :metro_area')
+    resp = bqclient.query(query).to_dataframe()
+
+    chart_ridership = alt.Chart(resp).mark_area().encode(
+    x=alt.X('month:T', axis=alt.Axis(title='Month')),
+    y=alt.Y('trips:Q', axis=alt.Axis(title='Total Transit Trips')),
+    color="mode:N",
+    tooltip=['month','mode', 'trips']
+    ).interactive()
+    html_chart = chart_ridership.save('chart_ridership.html')
+    html_response = f"""
+    <div>
+    {html_chart}
+    </div>
+    """
+    response = Response(response=html_response, status=200, mimetype="text/html")
+    return response
+
+if __name__ == "__main__":
+    app.jinja_env.auto_reload = True
+    app.config["TEMPLATES_AUTO_RELOAD"] = True
+    app.run(debug=True)
+
+#Old Code
+# Load Data--------------------------------------------------------------------------------------------------------------------------
 top50 = pd.read_csv("Data/top50.csv")
 
 census = pd.read_csv("Data/census.csv",
