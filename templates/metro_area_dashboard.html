@@ -53,7 +53,9 @@
           </span>            
         </a>
         <li class="nav-item ml-3">
-          <a class="btn btn-secondary" href="file:///C:/0_MUSA509/finalProject/final-project-jingzong-ben/templates/national_view.html" role="button">Back to National View</a>
+          <form action="{{ url_for('national') }}" method="GET">
+            <button class="btn btn-secondary">Back to National View</button>
+          </form>          
         </li>        
       </ul>
     </div>
@@ -63,8 +65,8 @@
     <div class="row justify-content-center align-items-center m-2">
       <div class="col-lg-5 col-8 chart">
         <h5>Explore Metro Area Detail:</h5>
-        <form action="" method="GET">
-          <select class="selectpicker" name="select_area" id= "area-select" data-live-search="true" data-width="350px">
+        <form action="{{ url_for('change_area') }}" method="POST">
+          <select class="selectpicker" name="metroArea" id= "area-select" data-live-search="true" data-width="350px">
             {% for area in area_list %} 
               <option value= {{ area }}>{{ area }}</option>
             {% endfor %} 
@@ -134,20 +136,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
 <script>
-  // If there is no default option, select first one.
-  function setDefaultOpt(select, defaultOpt){
-    if (defaultOpt == null) defaultOpt = select[0].firstElementChild.innerText;    
-    select.selectpicker('val', defaultOpt);    
-  }
-  // Populate options from list.
-  // function populateOptions(select, optionList, defaultOpt) {
-  //   for(var i = 0; i < optionList.length; i++){
-  //     select.append('<option value="'+optionList[i]+'">'+optionList[i]+'</option>');;      
-  //   }  
-  //   select.selectpicker("refresh"); 
-  //   setDefaultOpt(select, defaultOpt);
-  // }
-
   // Populate metro table from list.
   function populateTable(tableID, data) {
     for(var i = 1; data[i-1] != null; i++){

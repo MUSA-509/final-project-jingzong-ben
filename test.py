@@ -5,31 +5,67 @@ import logging
 
 app = Flask(__name__, template_folder="templates")
 
-area_list = ['Bridgeport-Stamford, CT-NY', 'Buffalo, NY', 'Charlotte, NC-SC', 'Chicago, IL-IN', 'Cincinnati, OH-KY-IN', 'Cleveland, OH', 'Columbus, OH', 'Dallas-Fort Worth-Arlington, TX', 'Dayton, OH', 'Denver-Aurora, CO', 'Detroit, MI', 'Durham, NC', 'Fresno, CA', 'Hartford, CT', 'Honolulu, HI', 'Houston, TX', 'Indianapolis, IN', 'Jacksonville, FL', 'Las Vegas-Henderson, NV', 'Los Angeles-Long Beach-Anaheim, CA', 'Louisville/Jefferson County, KY-IN', 'Miami, FL', 'Milwaukee, WI', 'Minneapolis-St. Paul, MN-WI', 'New Haven, CT', 'New Orleans, LA', 'New York-Newark, NY-NJ-CT', 'Orlando, FL', 'Philadelphia, PA-NJ-DE-MD', 'Phoenix-Mesa, AZ', 'Pittsburgh, PA', 'Portland, OR-WA', 'Providence, RI-MA', 'Reno, NV-CA', 'Richmond, VA', 'Riverside-San Bernardino, CA', 'Rochester, NY', 'Sacramento, CA', 'Salt Lake City-West Valley City, UT', 'San Antonio, TX', 'San Diego, CA', 'San Francisco-Oakland, CA', 'San Jose, CA', 'Seattle, WA', 'Spokane, WA', 'St.Louis, MO-IL', 'Tampa-St. Petersburg, FL', 'Tucson, AZ', 'Virginia Beach, VA', 'Washington, DC-VA-MD', 'Buffalo']
+area_list = ['Bridgeport-Stamford', 'Buffalo', 'Charlotte, NC-SC', 'Chicago, IL-IN', 'Cincinnati, OH-KY-IN', 'Cleveland, OH', 'Columbus, OH', 'Dallas-Fort Worth-Arlington, TX', 'Dayton, OH', 'Denver-Aurora', 'Detroit, MI', 'Durham, NC', 'Fresno, CA', 'Hartford, CT', 'Honolulu, HI', 'Houston, TX', 'Indianapolis', 'Jacksonville', 'Las Vegas-Henderson']
+month_list = ['2019-01', '2019-02', '2019-03', '2019-04', '2019-05', '2019-06', '2019-07', '2019-08', '2019-09', '2019-10', '2019-11', '2019-12', '2020-01', '2020-02', '2020-03', '2020-04', '2020-05', '2020-06', '2020-07', '2020-08', '2020-09']
 
-#test
+# Endpoint for first time loading national view
 @app.route("/national_test/")
-def nationalTest():
-    selected_date = request.args.get("selectedDate")
+def national():
+    # Set default selection     
     selected_date = '2019-02'
-    month_list = ['2019-01', '2019-02', '2019-03', '2019-04', '2019-05', '2019-06', '2019-07', '2019-08', '2019-09', '2019-10', '2019-11', '2019-12', '2020-01', '2020-02', '2020-03', '2020-04', '2020-05', '2020-06', '2020-07', '2020-08', '2020-09']
-
     selected_area = request.args.get("selectedArea")
 
+    # Change map.html in templates folder if needed    
+
+    # You can also set default selection here
     html_response = render_template(
         "national_view.html",
         month_list = month_list,
         selected_month = selected_date,
+        selected_modes = "Rail",
+        selected_overlay = "no",
         area_list = area_list,
         selected_area = selected_area
+    )
+    # It will include map.html in templates folder
+    response = Response(response=html_response, status=200, mimetype="text/html")
+    return response
+
+# Endpoint for refresh page
+@app.route("/national_refresh/", methods=['POST'])
+def refresh():
+    # Get selections from user.
+    selected_month = request.form.get("month")    
+    selected_mode = request.form.get("modes")
+    selected_overlay = request.form.get("overlay")
+
+    selected_area = 'Buffalo'
+
+    # Change the map.html in templates folder, the map in the page will be replace
+    # Though I'm not sure it is the right way to do
+
+    html_response = render_template(
+        "national_view.html",
+        month_list = month_list,
+        selected_month = selected_month,
+        selected_modes = selected_mode,
+        selected_overlay = selected_overlay,
+        area_list = area_list, 
+        selected_area = selected_area       
     )
     response = Response(response=html_response, status=200, mimetype="text/html")
     return response
 
-@app.route("/metro_view_test/")
-def metroTest():
-    selected_area = 'Buffalo'
-    table_data = {'0':'data0','1':'data1','2':'data2','3':'data3','4':'data4','5':'data5'}
+# Endpoint for first time loading metro area view
+@app.route("/metro_test/", methods=['POST'])
+def metro():
+    selected_area = request.form.get('metroArea')
+
+    # Modularize following sections so that they could be used in another endpoint.
+    # Query data
+    table_data = {'0': selected_area,'1':'data1','2':'data2','3':'data3','4':'data4','5':'data5'}
+
+    # Create charts
 
     html_response = render_template(
         "metro_area_dashboard.html",
@@ -39,6 +75,27 @@ def metroTest():
     )
     response = Response(response=html_response, status=200, mimetype="text/html")
     return response
+
+# Endpoint for changing area
+@app.route("/metro", methods=['POST'])
+def change_area():
+    selected_area = request.form.get('metroArea')
+
+    # Query data 
+    table_data = {'0': selected_area,'1':'newdata1','2':'newdata2','3':'newdata3','4':'newdata4','5':'newdata5'}
+
+    # Create charts
+
+    html_response = render_template(
+        "metro_area_dashboard.html",
+        area_list = area_list,
+        selected_area = selected_area,
+        table_data = table_data
+    )
+    response = Response(response=html_response, status=200, mimetype="text/html")
+    return response
+
+
 if __name__ == "__main__":
     app.jinja_env.auto_reload = True
     app.config["TEMPLATES_AUTO_RELOAD"] = True

@@ -52,7 +52,7 @@
 
     #metroExplore {
       position: fixed;
-      left: 350px;
+      right: 100px;
       bottom: 30px;
     }
   </style>
@@ -101,57 +101,59 @@
     <nav id="sidebarMenu" class="d-md-block bg-light sidebar collapse">
       <div class="sidebar-sticky pt-3">
         <ul class="nav flex-column px-4">
+          <form action="{{ url_for('refresh') }}" method="POST">
+            <!-- month -->
+            <li class="nav-item py-1 my-1">              
+              <h6>Month</h6>
+              <select id= "month-select" name="month" class="selectpicker">
+                {% for month in month_list %} 
+                  <option value= {{ month }}>{{ month }}</option>
+                {% endfor %} 
+              </select>              
+            </li>
 
-          <!-- month -->
-          <li class="nav-item py-1 my-1">              
-            <h6>Month</h6>
-            <select id= "month-select" class="selectpicker">
-              {% for month in month_list %} 
-                <option value= {{ month }}>{{ month }}</option>
-              {% endfor %} 
-            </select>              
-          </li>
+            <!-- modes -->
+            <li class="nav-item py-1 my-1">              
+              <h6>Modes</h6>
+              <select id="mode-select" name="modes" class="selectpicker">
+                <option value='Rail'>Rail</option>
+                <option value='Non-Rail'>Non-Rail</option>
+              </select>              
+            </li>
 
-          <!-- modes -->
-          <li class="nav-item py-1 my-1">              
-            <h6>Modes</h6>
-            <select id="mode-select" class="selectpicker">
-              <option value='Rail'>Rail</option>
-              <option value='Non-Rail'>Non-Rail</option>
-            </select>              
-          </li>
+            <!-- overlay -->
+            <li class="nav-item py-1 my-1">              
+              <h6 >Add an Overlay</h6>
+              <div class="pl-2">
+                <h7 class="my-3">COVID-19</h7>
+                <div class="ml-2 my-2">
+                  <label class="block"> <input  type="radio" name="overlay" id="Cases" value="Cases">  Cases  </label>
+                  <label class="block"> <input  type="radio" name="overlay" id="Deaths" value="Deaths">  Deaths  </label>
+                </div>
+                <h7 class="my-3">ACS 5-yr Estimates (2018)</h7>
+                <div class="ml-2 my-2">
+                  <label class="block"> <input  type="radio" name="overlay" id="Population" value="Population">  Population  </label>
+                  <label class="block"> <input  type="radio" name="overlay" id="HHIncome" value="HHIncome">  Household Income  </label>
+                  <label class="block"> <input  type="radio" name="overlay" id="noveh" value="noveh">   % Households with No Access to a Vehicle  </label>
+                  <label class="block"> <input  type="radio" name="overlay" id="transit" value="transit">  % Workers Commuting on Public Transit  </label>
+                  <label class="block"> <input  type="radio" name="overlay" id="service" value="service">  % Workers in Service Occupations  </label>
+                  <label class="block my-3"> <input  type="radio" name="overlay" id="no" value="no" checked>  no overlay  </label>
+                </div>
+              </div>              
+            </li>
 
-          <!-- overlay -->
-          <li class="nav-item py-1 my-1">              
-            <h6 >Add an Overlay</h6>            
-            <form class="my-3 ml-2">
-              <h7 class="my-3">COVID-19</h7>
-              <div class="ml-2 my-2">
-                <label class="block"> <input  type="radio" name="overlay" id="Cases" value="Cases">  Cases  </label>
-                <label class="block"> <input  type="radio" name="overlay" id="Deaths" value="Deaths">  Deaths  </label>
-              </div>
-              <h7 class="my-3">ACS 5-yr Estimates (2018)</h7>
-              <div class="ml-2 my-2">
-                <label class="block"> <input  type="radio" name="overlay" id="Population" value="Population">  Population  </label>
-                <label class="block"> <input  type="radio" name="overlay" id="HHIncome" value="HHIncome">  Household Income  </label>
-                <label class="block"> <input  type="radio" name="overlay" id="noveh" value="noveh">   % Households with No Access to a Vehicle  </label>
-                <label class="block"> <input  type="radio" name="overlay" id="transit" value="transit">  % Workers Commuting on Public Transit  </label>
-                <label class="block"> <input  type="radio" name="overlay" id="service" value="service">  % Workers in Service Occupations  </label>
-                <label class="block my-3"> <input  type="radio" name="overlay" id="no" value="no" checked>  no overlay  </label>
-              </div>
-            </form>                  
-          </li>
+            <li class="nav-item mt-2 md-3 pl-auto">
+              <button type="submit" class="btn btn-dark" id="refresh">Refresh</button>
+            </li>
 
-          <li class="nav-item mt-2 md-3 ml-auto">
-            <button class="btn btn-dark" id="refresh">Refresh</button>
-          </li>
-
-          <li class="nav-item mt-3  ml-auto">
-            <button class="btn btn-link-secondary  btn-sm">Export Data <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-download" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd" d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-              <path fill-rule="evenodd" d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
-            </svg></button>
-          </li>
+            <li class="nav-item mt-3 pl-auto">
+              <button class="btn btn-link-secondary  btn-sm">Export Data <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-download" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                <path fill-rule="evenodd" d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+              </svg></button>
+            </li>
+          </form>
+         
 
         </ul>
         
@@ -169,8 +171,8 @@
     <!-- Select metro area -->
     <div id="metroExplore">
       <h6>Explore a Metro Area:</h6>
-      <form action="" method="GET">
-        <select class="selectpicker" id= "area-select" name="select_metro" data-live-search="true" data-width="500px">
+      <form action="{{ url_for('metro') }}" method="POST">
+        <select class="selectpicker" id= "area-select" name="metroArea" data-live-search="true" data-width="500px">
           {% for area in area_list %} 
             <option value= {{ area }}>{{ area }}</option>
           {% endfor %} 
@@ -206,41 +208,32 @@
   // }
 
   $( document ).ready(function() {
-    // Populate month options. 
-    // var monthList = {{ month_list|safe }} ; 
-    // console.log(monthList);
-    var selectedMonth = {{ selected_month|tojson }}; 
-    console.log(selectedMonth);
-    // // var monthList = ['2019-01', '2019-02', '2019-03', '2019-04', '2019-05', '2019-06', '2019-07', '2019-08', '2019-09', '2019-10', '2019-11', '2019-12', '2020-01', '2020-02', '2020-03', '2020-04', '2020-05', '2020-06', '2020-07', '2020-08', '2020-09']; // test
-    // // var selectedMonth = null; // test
-    // populateOptions($('#month-select'), monthList, selectedMonth);
+    // Set default month 
+    var selectedMonth = {{ selected_month|tojson }};
     setDefaultOpt($('#month-select'), selectedMonth);
 
-    // Populate metro area options   
-    // var areaList = {{metro_area_list|safe}};
-    var selectedArea = {{ selected_area|tojson }};
-    console.log(selectedArea);
-//     var areaList = ['Bridgeport-Stamford, CT-NY', 'Buffalo, NY', 'Charlotte, NC-SC', 'Chicago, IL-IN', 'Cincinnati, OH-KY-IN', 'Cleveland, OH', 'Columbus, OH', 'Dallas-Fort Worth-Arlington, TX', 'Dayton, OH', 'Denver-Aurora, CO', 'Detroit, MI', 'Durham, NC', 'Fresno, CA', 'Hartford, CT', 'Honolulu, HI', 'Houston, TX', 'Indianapolis, IN', 'Jacksonville, FL', 'Las Vegas-Henderson, NV', 'Los Angeles-Long Beach-Anaheim, CA', 'Louisville/Jefferson County, KY-IN', 'Miami, FL', 'Milwaukee, WI', 
-// 'Minneapolis-St. Paul, MN-WI', 'New Haven, CT', 'New Orleans, LA', 'New York-Newark, NY-NJ-CT', 'Orlando, FL', 'Philadelphia, PA-NJ-DE-MD', 'Phoenix-Mesa, AZ', 'Pittsburgh, PA', 'Portland, OR-WA', 'Providence, RI-MA', 'Reno, NV-CA', 'Richmond, VA', 'Riverside-San Bernardino, CA', 'Rochester, NY', 'Sacramento, CA', 'Salt Lake City-West Valley City, UT', 'San Antonio, TX', 'San Diego, CA', 'San Francisco-Oakland, CA', 'San Jose, CA', 'Seattle, WA', 'Spokane, WA', 'St. Louis, MO-IL', 'Tampa-St. Petersburg, FL', 'Tucson, AZ', 'Virginia Beach, VA', 'Washington, DC-VA-MD']; // test
-//     var selectedArea = null; // test
-    // populateOptions($('#area-select'), areaList, selectedArea);
-    setDefaultOpt($('#area-select'), selectedArea);
-    
     // Set default modes
-    var selectedModes = {{ selected_modes }};
-    // var selectedModes = null; // test
+    var selectedModes = {{ selected_modes|tojson }};
     setDefaultOpt($('#mode-select'), selectedModes);
 
+    // Set default overlay
+    var selectedOverlay = {{ selected_overlay|tojson }};
+    $('input:radio[name=overlay]').filter(`[value=${selectedOverlay}]`).prop('checked', true);
+
+
+    // Set default area
+    var selectedArea = {{ selected_area|tojson }}; 
+    setDefaultOpt($('#area-select'), selectedArea);
   }); 
 
   // Refresh button
-  $('#refresh').on('click', async function() {
-    var month = $('#month-select').val();
-    var modes = $('modes-select').val();
-    var overlay = $('input[name=overlay]:checked').val();
-    console.log(`?select_date=${month}&select_classification=${modes}&select_metric=${overlay}`)
-    const res = await axios.get(`?select_date=${month}&select_classification=${modes}&select_metric=${overlay}`);    
-  }); 
+  // $('#refresh').on('click', async function() {
+  //   var month = $('#month-select').val();
+  //   var modes = $('modes-select').val();
+  //   var overlay = $('input[name=overlay]:checked').val();
+  //   console.log(`?select_date=${month}&select_classification=${modes}&select_metric=${overlay}`)
+  //   const res = await axios.get(`?select_date=${month}&select_classification=${modes}&select_metric=${overlay}`);    
+  // }); 
 
 
 
