@@ -7,6 +7,7 @@ import pandas as pd
 import altair as alt
 from altair_saver import save
 import plotly.express as px
+from urllib.request import urlopen
 
 app = Flask(__name__, template_folder="templates")
 bqclient = bigquery.Client.from_service_account_json('C:/Users/bennd/Documents/MUSA509/TransitPolicyApp-99838a65a6ed.json')
@@ -34,7 +35,7 @@ def national():
     )
     resp1 = bqclient.query(query1).to_dataframe()
 
-    fig1 = px.scatter_mapbox(ridership_agg, lat="lat", lon="lon", size="trips", 
+    fig1 = px.scatter_mapbox(resp1, lat="lat", lon="lon", size="trips", 
                             color_continuous_scale=px.colors.sequential.Jet, size_max=80, 
                             zoom=3, hover_data=["trips"], hover_name='metro_area'
                             )
@@ -54,12 +55,12 @@ def national():
         counties = json.load(response)
 
     fig2 = px.choropleth(resp2, geojson=counties, locations='fips', color='cases',
-                            color_continuous_scale="Viridis",
-                            range_color=(0, 12),
+                            color_continuous_scale="Reds",
+                            color_continuous_midpoint=5000, range_color=(0,300000),
                             scope="usa")
 
     fig2.update_layout(mapbox_style="open-street-map")
-    fig2.update_layout(title=f'Total COVID-19 Cases')
+    fig2.update_layout(title=f'Cumulative COVID-19 Cases')
     fig2.write_html("templates/map_overlay.html")
 
     # Change map.html in templates folder if needed
