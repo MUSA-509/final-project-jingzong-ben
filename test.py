@@ -20,10 +20,10 @@ month_list = ['2019-01', '2019-02', '2019-03', '2019-04', '2019-05', '2019-06', 
 @app.route("/national_test/")
 def national():
     # Set default selection     
-    selected_month = request.form.get("month")
-    selected_modes = request.form.get("modes")
-    selected_overlay = request.form.get("overlay")
-    selected_area = request.form.get("area")
+    selected_month = request.args.get("month")
+    selected_modes = request.args.get("modes")
+    selected_overlay = request.args.get("overlay")
+    selected_area = request.args.get("area")
     print(selected_month)
     print(selected_modes)
 
@@ -80,14 +80,15 @@ def national():
     return response
 
 # Endpoint for refresh page
-@app.route("/national_refresh/", methods=['POST'])
+@app.route("/national_refresh/", methods=['GET'])
 def refresh():
     # Get selections from user.
-    selected_month = request.form.get("month")    
-    selected_mode = request.form.get("modes")
-    selected_overlay = request.form.get("overlay")
-
-    selected_area = 'Buffalo'
+    selected_month = request.args.get("month")
+    selected_modes = request.args.get("modes")
+    selected_overlay = request.args.get("overlay")
+    selected_area = request.args.get("area")
+    print(selected_month)
+    print(selected_modes)
 
     # Change the map.html in templates folder, the map in the page will be replace
     # Though I'm not sure it is the right way to do
@@ -96,7 +97,7 @@ def refresh():
         "national_view.html",
         month_list = month_list,
         selected_month = selected_month,
-        selected_modes = selected_mode,
+        selected_modes = selected_modes,
         selected_overlay = selected_overlay,
         area_list = area_list, 
         selected_area = selected_area       
@@ -105,9 +106,9 @@ def refresh():
     return response
 
 # Endpoint for first time loading metro area view
-@app.route("/metro_test/", methods=['POST'])
+@app.route("/metro_test/", methods=['GET'])
 def metro():
-    selected_area = request.form.get('metroArea')
+    selected_area = request.args.get('metroArea')
 
     # Modularize following sections so that they could be used in another endpoint.
     
@@ -183,9 +184,9 @@ def metro():
     return response
 
 # Endpoint for changing area
-@app.route("/metro", methods=['POST'])
+@app.route("/metro", methods=['GET'])
 def change_area():
-    selected_area = request.form.get('metroArea')
+    selected_area = request.args.get('metroArea')
 
     # Modularize following sections so that they could be used in another endpoint.
     

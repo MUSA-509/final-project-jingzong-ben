@@ -101,7 +101,7 @@
     <nav id="sidebarMenu" class="d-md-block bg-light sidebar collapse">
       <div class="sidebar-sticky pt-3">
         <ul class="nav flex-column px-4">
-          <form action="{{ url_for('refresh') }}" method="POST">
+          <form action="{{ url_for('refresh') }}" method="GET">
             <!-- month -->
             <li class="nav-item py-1 my-1">              
               <h6>Month</h6>
@@ -172,7 +172,7 @@
     <!-- Select metro area -->
     <div id="metroExplore">
       <h6>Explore a Metro Area:</h6>
-      <form action="{{ url_for('metro') }}" method="POST">
+      <form action="{{ url_for('metro') }}" method="GET">
         <select class="selectpicker" id= "area-select" name="metroArea" data-live-search="true" data-width="500px">
           {% for area in area_list %} 
             <option value= {{ area }}>{{ area }}</option>
