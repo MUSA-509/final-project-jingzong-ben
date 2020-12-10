@@ -5,6 +5,8 @@ import logging
 from google.cloud import bigquery
 import pandas as pd
 import altair as alt
+from altair_saver import save
+import plotly.express as px
 
 app = Flask(__name__, template_folder="templates")
 bqclient = bigquery.Client.from_service_account_json('C:/Users/bennd/Documents/MUSA509/TransitPolicyApp-99838a65a6ed.json')
@@ -67,26 +69,69 @@ def metro():
     selected_area = request.form.get('metroArea')
 
     # Modularize following sections so that they could be used in another endpoint.
-    # Query data
-    table_data = {'0': selected_area,'1':'data1','2':'data2','3':'data3','4':'data4','5':'data5'}
+    
+    #Census Table
+    query1 = (
+         'SELECT metro_area, pop_18, hh_size, hh_income, rent_share, pt_share, service_share'
+         ' FROM transitpolicyapp.ridership.top50_census'
+         ' WHERE metro_area =  \''+selected_area + 
+         '\' GROUP BY metro_area, pop_18, hh_size, hh_income, rent_share, pt_share, service_share'
+         )
+    resp1 = bqclient.query(query1).to_dataframe()
+    
+    table_data = pd.melt(resp1, id_vars='metro_area', value_vars=['pop_18', 'hh_size', 'hh_income', 'rent_share', 'pt_share', 'service_share'])
+    table_data = table_data.replace({'pop_18': 'Population (2018)', 'hh_size': 'Avg. Household Size', 'hh_income': 'Median Household Income', 'rent_share': 'Renter-occupied housing units', 'pt_share': 'Primary Mode to Work: Public Transit', 'service_share': 'Workers in Service Occupations'})
+    table_data = table_data[['variable','value']]
+    table_data = table_data.to_json(orient="values")
+    
+    #Example of new table_data output: [["Population (2018)",944348.0],["Avg. Household Size",2.72],["Median Household Income",92969.0],["Renter-occupied housing units",0.33],["Primary Mode to Work: Public Transit",0.1],["Workers in Service Occupations",0.18]]
+    #table_data = {'0': selected_area,'1':'data1','2':'data2','3':'data3','4':'data4','5':'data5'}
 
-    # Create charts
-    query = (
+    #Ridership Chart
+    query2 = (
          'SELECT metro_area, month, mode, trips'
          ' FROM transitpolicyapp.ridership.top50_ridership'
          ' WHERE metro_area =  \''+selected_area + 
          '\' GROUP BY metro_area, month, mode, trips')
-    resp = bqclient.query(query).to_dataframe()
+    resp2 = bqclient.query(query2).to_dataframe()
+
+    chart_ridership = px.area(resp2, x="month", y="trips", color="mode")
+    chart_ridership.write_html("templates/chart_ridership.html")
+
+    #Scatterplot
+    query4 = (
+        'SELECT r.metro_area, sum(r.trips) as trips, c.metro_area, c.cases, c.date'
+        ' FROM transitpolicyapp.ridership.top50_ridership as r'
+        ' JOIN transitpolicyapp.ridership.top50_covid as c'
+        ' ON c.metro_area = r.metro_area'
+        ' WHERE c.date = "2020-11-30"'
+        ' GROUP BY r.metro_area, c.metro_area, c.cases, c.date'
+    )
+    resp4 = bqclient.query(query4).to_dataframe()
+
+    chart_scatter = px.scatter(resp4, x="cases", y="trips")
+    chart_scatter.write_html("templates/chart_scatter.html")
+
+    #COVID Charts
+    query3 = (
+         'SELECT date, metro_area, cases, deaths'
+         ' FROM transitpolicyapp.ridership.top50_covid'
+         ' WHERE metro_area =  \''+selected_area + 
+         '\' GROUP BY date, metro_area, cases, deaths')
+    resp3 = bqclient.query(query3).to_dataframe()
     
-    chart_ridership = alt.Chart(resp).mark_area().encode(
-        x=alt.X('month:T', axis=alt.Axis(title='Month')),
-        y=alt.Y('trips:Q', axis=alt.Axis(title='Total Transit Trips')),
-        color="mode:N",
-        tooltip=['month','mode', 'trips']
-        ).interactive()
+    resp3['new_cases'] = resp3['cases'].diff()
+    resp3['new_deaths'] = resp3['deaths'].diff()
+    resp3['cases_avg'] = resp3.iloc[:,4].rolling(window=7).mean()
+    resp3['deaths_avg'] = resp3.iloc[:,5].rolling(window=7).mean()
+    
+    chart_cases = px.bar(resp3, x='date', y='cases_avg')
+    chart_cases.write_html("templates/chart_cases.html")
 
-    html_chart = chart_ridership.save('templates/chart_ridership.html')
+    chart_deaths = px.bar(resp3, x='date', y='deaths_avg')
+    chart_deaths.write_html("templates/chart_deaths.html")
 
+    #Response
     html_response = render_template(
         "metro_area_dashboard.html",
         area_list = area_list,
@@ -101,26 +146,70 @@ def metro():
 def change_area():
     selected_area = request.form.get('metroArea')
 
-    # Query data 
-    table_data = {'0': selected_area,'1':'newdata1','2':'newdata2','3':'newdata3','4':'newdata4','5':'newdata5'}
+    # Modularize following sections so that they could be used in another endpoint.
+    
+    #Census Table
+    query1 = (
+         'SELECT metro_area, pop_18, hh_size, hh_income, rent_share, pt_share, service_share'
+         ' FROM transitpolicyapp.ridership.top50_census'
+         ' WHERE metro_area =  \''+selected_area + 
+         '\' GROUP BY metro_area, pop_18, hh_size, hh_income, rent_share, pt_share, service_share'
+         )
+    resp1 = bqclient.query(query1).to_dataframe()
+    
+    table_data = pd.melt(resp1, id_vars='metro_area', value_vars=['pop_18', 'hh_size', 'hh_income', 'rent_share', 'pt_share', 'service_share'])
+    table_data = table_data.replace({'pop_18': 'Population (2018)', 'hh_size': 'Avg. Household Size', 'hh_income': 'Median Household Income', 'rent_share': 'Renter-occupied housing units', 'pt_share': 'Primary Mode to Work: Public Transit', 'service_share': 'Workers in Service Occupations'})
+    table_data = table_data[['variable','value']]
+    table_data = table_data.to_json(orient="values")
+    
+    #Example of new table_data output: [["Population (2018)",944348.0],["Avg. Household Size",2.72],["Median Household Income",92969.0],["Renter-occupied housing units",0.33],["Primary Mode to Work: Public Transit",0.1],["Workers in Service Occupations",0.18]]
+    #table_data = {'0': selected_area,'1':'data1','2':'data2','3':'data3','4':'data4','5':'data5'}
 
-    # Create charts
-    query = (
+    #Ridership Chart
+    query2 = (
          'SELECT metro_area, month, mode, trips'
          ' FROM transitpolicyapp.ridership.top50_ridership'
          ' WHERE metro_area =  \''+selected_area + 
          '\' GROUP BY metro_area, month, mode, trips')
-    resp = bqclient.query(query).to_dataframe()
+    resp2 = bqclient.query(query2).to_dataframe()
+
+    chart_ridership = px.area(resp2, x="month", y="trips", color="mode")
+    chart_ridership.write_html("templates/chart_ridership.html")
+
+    #Scatterplot
+    query4 = (
+        'SELECT r.metro_area, sum(r.trips) as trips, c.metro_area, c.cases, c.date'
+        ' FROM transitpolicyapp.ridership.top50_ridership as r'
+        ' JOIN transitpolicyapp.ridership.top50_covid as c'
+        ' ON c.metro_area = r.metro_area'
+        ' WHERE c.date = "2020-11-30"'
+        ' GROUP BY r.metro_area, c.metro_area, c.cases, c.date'
+    )
+    resp4 = bqclient.query(query4).to_dataframe()
+
+    chart_scatter = px.scatter(resp4, x="cases", y="trips")
+    chart_scatter.write_html("templates/chart_scatter.html")
+
+    #COVID Charts
+    query3 = (
+         'SELECT date, metro_area, cases, deaths'
+         ' FROM transitpolicyapp.ridership.top50_covid'
+         ' WHERE metro_area =  \''+selected_area + 
+         '\' GROUP BY date, metro_area, cases, deaths')
+    resp3 = bqclient.query(query3).to_dataframe()
     
-    chart_ridership = alt.Chart(resp).mark_area().encode(
-        x=alt.X('month:T', axis=alt.Axis(title='Month')),
-        y=alt.Y('trips:Q', axis=alt.Axis(title='Total Transit Trips')),
-        color="mode:N",
-        tooltip=['month','mode', 'trips']
-        ).interactive()
+    resp3['new_cases'] = resp3['cases'].diff()
+    resp3['new_deaths'] = resp3['deaths'].diff()
+    resp3['cases_avg'] = resp3.iloc[:,4].rolling(window=7).mean()
+    resp3['deaths_avg'] = resp3.iloc[:,5].rolling(window=7).mean()
+    
+    chart_cases = px.bar(resp3, x='date', y='cases_avg')
+    chart_cases.write_html("templates/chart_cases.html")
 
-    html_chart = chart_ridership.save('templates/chart_ridership.html')
+    chart_deaths = px.bar(resp3, x='date', y='deaths_avg')
+    chart_deaths.write_html("templates/chart_deaths.html")
 
+    #Response
     html_response = render_template(
         "metro_area_dashboard.html",
         area_list = area_list,

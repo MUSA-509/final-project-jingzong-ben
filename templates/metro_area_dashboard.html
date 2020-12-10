@@ -104,27 +104,23 @@
         </table>
       </div>        
       <div class="col-lg-7 col-8 chart">
-        <!-- replace h2 with chart or table-->
         <div id="ridership">
           {% include 'chart_ridership.html' %}
         </div>
         
       </div>
       <div class="col-lg-5 col-8 chart">
-        <!-- replace h2 with chart or table-->
-        <h2>Scatterplot</h2>
         <div class="scatter">
-          <!-- {% include 'scatter.html' %} -->
+          {% include 'chart_scatter.html' %}
         </div>
       </div>
       <div class="col-lg-7 col-8 chart">
-        <!-- replace h2 with chart or table-->
         <div class="row justify-content-center align-items-center">
           <div class="col-10 col-lg-6 chart">
-            <h2>COVID-19 Cases</h2>
+            {% include 'chart_cases.html' %}
           </div>
           <div class="col-10 col-lg-6 chart">
-            <h2>COVID-19 Deaths</h2>
+            {% include 'chart_deaths.html' %}
           </div>
         </div>
       </div>
