@@ -22,19 +22,47 @@ def national():
     selected_month = request.form.get("month")
     selected_modes = request.form.get("modes")
     selected_overlay = request.form.get("overlay")
-    selected_Area = request.form.get("area")
+    selected_area = request.form.get("area")
     print(selected_month)
     print(selected_modes)
 
-    #query = (
-    #    'SELECT metro_area, GEOID10, month, sum(trips) as trips, classification, min(lat) as lat, min(lon) as lon'
-    #    ' FROM transitpolicyapp.ridership.Ridership'
-    #    ' WHERE month = \''+selected_date + '\' AND classification = \''+selected_month + '\''
-    #    ' GROUP BY metro_area, GEOID10, month, classification'
-    #)
-    #print(query)
-    # Change map.html in templates folder if needed    
+    query1 = (
+        'SELECT metro_area, GEOID10, month, sum(trips) as trips, classification, min(lat) as lat, min(lon) as lon'
+        ' FROM transitpolicyapp.ridership.Ridership'
+        ' WHERE month = "2020-04" AND classification = "Non-Rail"'
+        ' GROUP BY metro_area, GEOID10, month, classification'
+    )
+    resp1 = bqclient.query(query1).to_dataframe()
 
+    fig1 = px.scatter_mapbox(ridership_agg, lat="lat", lon="lon", size="trips", 
+                            color_continuous_scale=px.colors.sequential.Jet, size_max=80, 
+                            zoom=3, hover_data=["trips"], hover_name='metro_area'
+                            )
+    fig1.update_layout(mapbox_style="open-street-map")
+    fig1.update_layout(title=f'Total Transit Trips')
+    fig1.write_html("templates/map.html")
+
+    query2 = (
+        'SELECT county_fips_code as fips, max(confirmed_cases) as cases, max(deaths) as deaths'
+        ' FROM bigquery-public-data.covid19_nyt.us_counties'
+        ' WHERE county_fips_code IS NOT NULL'
+        ' GROUP BY county_fips_code'
+    )
+    resp2 = bqclient.query(query2).to_dataframe()
+    
+    with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json') as response:
+        counties = json.load(response)
+
+    fig2 = px.choropleth(resp2, geojson=counties, locations='fips', color='cases',
+                            color_continuous_scale="Viridis",
+                            range_color=(0, 12),
+                            scope="usa")
+
+    fig2.update_layout(mapbox_style="open-street-map")
+    fig2.update_layout(title=f'Total COVID-19 Cases')
+    fig2.write_html("templates/map_overlay.html")
+
+    # Change map.html in templates folder if needed
     # You can also set default selection here
     html_response = render_template(
         "national_view.html",
