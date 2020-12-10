@@ -19,21 +19,33 @@ month_list = ['2019-01', '2019-02', '2019-03', '2019-04', '2019-05', '2019-06', 
 @app.route("/national_test/")
 def national():
     # Set default selection     
-    selected_date = '2019-02'
-    selected_area = request.args.get("selectedArea")
+    selected_month = request.form.get("month")
+    selected_modes = request.form.get("modes")
+    selected_overlay = request.form.get("overlay")
+    selected_Area = request.form.get("area")
+    print(selected_month)
+    print(selected_modes)
 
+    #query = (
+    #    'SELECT metro_area, GEOID10, month, sum(trips) as trips, classification, min(lat) as lat, min(lon) as lon'
+    #    ' FROM transitpolicyapp.ridership.Ridership'
+    #    ' WHERE month = \''+selected_date + '\' AND classification = \''+selected_month + '\''
+    #    ' GROUP BY metro_area, GEOID10, month, classification'
+    #)
+    #print(query)
     # Change map.html in templates folder if needed    
 
     # You can also set default selection here
     html_response = render_template(
         "national_view.html",
         month_list = month_list,
-        selected_month = selected_date,
-        selected_modes = "Rail",
-        selected_overlay = "no",
-        area_list = area_list,
-        selected_area = selected_area
+        selected_month = selected_month,
+        selected_modes = selected_modes,
+        selected_overlay = selected_overlay,
+        selected_area = selected_area,
+        area_list = area_list
     )
+
     # It will include map.html in templates folder
     response = Response(response=html_response, status=200, mimetype="text/html")
     return response
