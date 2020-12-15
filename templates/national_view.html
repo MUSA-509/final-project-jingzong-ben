@@ -53,14 +53,13 @@
 
     #map {   
       position: fixed;       
-      width: 90%;
-      height: 150%;
-      top: 23px;
-      left: 200px;
-      right: 100px;
-      bottom: 100px;
-      padding: 50px;
-      z-index: -200;
+      width: 100%;
+      height: 100%;
+      top: 75px;
+      left: 300px;
+      right: 0px;
+      bottom: 0px;
+      padding: 0px;
     }
 
     #metroExplore {
@@ -114,7 +113,11 @@
     <nav id="sidebarMenu" class="d-md-block bg-light sidebar collapse">
       <div class="sidebar-sticky pt-3">
         <ul class="nav flex-column px-4">
+<<<<<<< HEAD
           <form class ="position-relative" action="{{ url_for('refresh') }}" method="POST">
+=======
+          <form action="{{ url_for('refresh') }}" method="GET">
+>>>>>>> dbd9a31b4a07aedf1b4115554653cd4820d8ee3a
             <!-- month -->
             <li class="nav-item py-1 my-1">              
               <h6>Month</h6>
@@ -173,13 +176,12 @@
     <!-- Map -->
     <div id="map">
       {% include 'map.html' %}
-      {% include 'map_overlay.html' %}
     </div>
 
     <!-- Select metro area -->
     <div id="metroExplore">
       <h6>Explore a Metro Area:</h6>
-      <form action="{{ url_for('metro') }}" method="POST">
+      <form action="{{ url_for('metro') }}" method="GET">
         <select class="selectpicker" id= "area-select" name="metroArea" data-live-search="true" data-width="500px">
           {% for area in area_list %} 
             <option value= {{ area }}>{{ area }}</option>
