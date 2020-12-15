@@ -39,9 +39,9 @@
  
   <!-- navbar -->
   <nav class="navbar navbar-expand-md navbar-dark bg-dark stick-top shadow">
-    <a class="navbar-brand ml-4" href="#">
-      <img src="https://github.com/MUSA-509/final-project-jingzong-ben/blob/master/Images/logo.png?raw=true" alt="logo" width="40" height="40">
-      <strong>Transit Ridership During COVID-19</strong>        
+    <a class="navbar-brand" href="#">
+      <img class="mx-2" src="https://github.com/MUSA-509/final-project-jingzong-ben/blob/master/Images/logo.png?raw=true" alt="logo" width="40" height="40">
+      <strong> Transit Ridership During COVID-19</strong>        
     </a>
     <p class="mt-3" style="color:white;">(by Ben & Jingzong) </p>
   
@@ -73,13 +73,19 @@
           </select>
           <button type="submit" id="exploreBtn" class="btn btn-dark">Explore ></button> 
         </form>
+
+        {% include 'table.html' %}
                 
-        <table id="metro_table" class="table table-light m-3">
+        <!-- <table id="metro_table" class="table table-light m-3">
           <tbody>
-            <tr>
-              <th scope="row">Population (2018)</th>
-              <td>10098052</td>
-            </tr>
+            {% for row in table_data %} 
+              <tr>
+                <th scope="row">{{ row[0] }}</th>
+                <td>{{ row[1] }}</td>
+              </tr>
+            {% endfor %} 
+            
+  
             <tr>
               <th scope="row">Avg. Household Size</td>
               <td>3</td>
@@ -99,9 +105,9 @@
             <tr>
               <th scope="row">Workers in Service Occupations</th>
               <td>19%</td>
-            </tr>
+            </tr> 
           </tbody>
-        </table>
+        </table> -->
       </div>        
       <div class="col-lg-7 col-8 chart">
         <div id="ridership">
@@ -134,7 +140,7 @@
 <script>
   // Populate metro table from list.
   function populateTable(tableID, data) {
-    for(var i = 1; data[i-1] != null; i++){
+    for(let i = 1; data[i-1] != null; i++){
       try {
         $('#'+tableID+' tr:nth-child('+i+') td').first().text(data[i-1]);
       } catch(e) {
@@ -149,8 +155,13 @@
 
 
     // Populate metro table
-    // var tableData = {{ table_data }};
-    populateTable('metro_table', {{ table_data|tojson }});    
+    // let tableData = {{ table_data }};
+    // populateTable('metro_table', {{ table_data|tojson }});    
+
+    $('table').addClass("table table-light m-3")
+    $('table').removeClass("dataframe")
+    $("table tr td:first-child").wrapInner('<div />').find('div').unwrap().wrap('<th/>');
+    $('th').attr('scope','row')
 
   }); 
 </script>
