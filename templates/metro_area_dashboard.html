@@ -40,7 +40,7 @@
   <!-- navbar -->
   <nav class="navbar navbar-expand-md navbar-dark bg-dark stick-top shadow">
     <a class="navbar-brand" href="#">
-      <img class="mx-2" src="https://github.com/MUSA-509/final-project-jingzong-ben/blob/master/Images/logo.png?raw=true" alt="logo" width="40" height="40">
+      <img class="mx-2" src="https://github.com/MUSA-509/final-project-jingzong-ben/blob/master/assets/logo.png?raw=true" alt="logo" width="40" height="28">
       <strong> Transit Ridership During COVID-19</strong>        
     </a>
     <p class="mt-3" style="color:white;">(by Ben & Jingzong) </p>
@@ -65,7 +65,7 @@
     <div class="row justify-content-center align-items-center m-2">
       <div class="col-lg-5 col-8 chart">
         <h5>Explore Metro Area Detail:</h5>
-        <form action="{{ url_for('change_area') }}" method="POST">
+        <form action="{{ url_for('change_area') }}" method="GET">
           <select class="selectpicker" name="metroArea" id= "area-select" data-live-search="true" data-width="350px">
             {% for area in area_list %} 
               <option value= {{ area }}>{{ area }}</option>
@@ -152,11 +152,7 @@
   $( document ).ready(function() {
     // Set default metro area option
     $('#area-select').selectpicker('val', {{ selected_area|tojson }});
-
-
-    // Populate metro table
-    // let tableData = {{ table_data }};
-    // populateTable('metro_table', {{ table_data|tojson }});    
+  
 
     $('table').addClass("table table-light m-3")
     $('table').removeClass("dataframe")
