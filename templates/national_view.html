@@ -1,204 +1,180 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-  <!-- Basic Page Needs -->
-  <meta charset="utf-8">
-  <title>Transit Ridership During COVID-19</title>
-  <meta name="description" content="">
-  <meta name="author" content="">
+  <head>
+    <!-- Basic Page Needs -->
+    <meta charset="utf-8">
+    <title>Transit Ridership During COVID-19</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-  <!-- Mobile Specific Metas -->
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Mobile Specific Metas -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
-        crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+          crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-  <style>
-    .sidebar {
-      position: fixed;
-      width: 300px;
-      top: 70px;
-      bottom: 0;
-      left: 0;
-      z-index: -100; /* Behind the navbar */
-      padding: 0px 0 0; /* Height of navbar */
-      box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
-    }
-    .block {
-      display: block;
-    }
-    #exportBtn {
-      position: fixed;
-      top: 92%;
-      left: 150px;
-    }
+    <style>
+      .sidebar {
+        position: fixed;
+        width: 270px;
+        top: 70px;
+        bottom: 0;
+        left: 0;
+        z-index: -100; /* Behind the navbar */
+        padding: 0px 0 0; /* Height of navbar */
+        box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+      }
+      .block {
+        display: block;
+      }
+      #map {
+        position: fixed;
+        left:270px;
+        right:50px;
+        z-index: -100;
+      }
+      .main-svg {   
+        position: fixed;       
+        width: 60%;
+        height: 100%;
+        left: 300px;
+        right: 100px;
+        z-index: -200;
+      }
 
-    #map {   
-      position: fixed;       
-      width: 100%;
-      height: 100%;
-      top: 75px;
-      left: 300px;
-      right: 0px;
-      bottom: 0px;
-      padding: 0px;
-    }
+      #metroExplore {
+        position: fixed;
+        right: 70px;
+        bottom: 30px;
+      }
+    </style>
 
-    #metroExplore {
-      position: fixed;
-      right: 100px;
-      bottom: 30px;
-    }
-  </style>
-
-</head>
-<body>
- 
-  <!-- navbar -->
-  <nav class="navbar navbar-expand-md navbar-dark bg-dark stick-top shadow">
-    <a class="navbar-brand ml-4" href="#">
-      <img src="https://github.com/MUSA-509/final-project-jingzong-ben/blob/master/assets/logo.png?raw=true" alt="logo" width="40" height="40">
-      <strong>Transit Ridership During COVID-19</strong>        
-    </a>
-    <p class="mt-3" style="color:white;">(by Ben & Jingzong) </p>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navs" aria-controls="navbarsExample04" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+  </head>
+  <body>
   
-    <div class="collapse navbar-collapse mr-1" id="navs">
-      <ul class="navbar-nav ml-auto mr-5">
-        <!-- github icon -->
-        <li class="nav-link mr-1">
-          <a href="https://github.com/MUSA-509/final-project-jingzong-ben">
-            <span style="font-size: 27px; color: White;">
-              <i class="fab fa-github"></i>
-            </span>            
-          </a>
-        </li>
-        <!-- data sources -->
-        <li class="nav-item dropdown mt-2">
-          <a class="nav-link dropdown-toggle" href="#" id="navDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Data Sources
-          </a>
-          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navDropdown">
-            <a class="dropdown-item" href="https://www.transit.dot.gov/ntd/data-product/monthly-module-adjusted-data-release">National Transit Database</a>
-            <a class="dropdown-item" href="https://www.census.gov/programs-surveys/acs">ACS 5-year Estimates (2018)</a>
-            <a class="dropdown-item" href="https://github.com/nytimes/covid-19-data">The New York Times COVID-19 Repo</a>
-          </div>
-        </li>        
-      </ul>
-    </div>
-  </nav>
-
-  <!-- Sidebar -->
-  <div class="container-fluid">
-    <nav id="sidebarMenu" class="d-md-block bg-light sidebar collapse">
-      <div class="sidebar-sticky pt-3">
-        <ul class="nav flex-column px-4">
-          <form action="{{ url_for('refresh') }}" method="GET">
-            <!-- month -->
-            <li class="nav-item py-1 my-1">              
-              <h6>Month</h6>
-              <select id= "month-select" name="month" class="selectpicker">
-                {% for month in month_list %} 
-                  <option value= {{ month }}>{{ month }}</option>
-                {% endfor %} 
-              </select>              
-            </li>
-
-            <!-- modes -->
-            <li class="nav-item py-1 my-1">              
-              <h6>Modes</h6>
-              <select id="mode-select" name="modes" class="selectpicker">
-                <option value='Rail'>Rail</option>
-                <option value='Non-Rail'>Non-Rail</option>
-              </select>              
-            </li>
-
-            <li class="nav-item mt-2 md-3 pl-auto">
-              <button type="submit" class="btn btn-dark" id="refresh">Refresh</button>
-            </li>
-
-          </form>
-         
-
+    <!-- navbar -->
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark stick-top shadow">
+      <a class="navbar-brand ml-4" href="#">
+        <img src="https://github.com/MUSA-509/final-project-jingzong-ben/blob/master/assets/logo.png?raw=true" alt="logo" width="40" height="40">
+        <strong>Transit Ridership During COVID-19</strong>        
+      </a>
+      <p class="mt-3" style="color:white;">(by Ben & Jingzong) </p>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navs" aria-controls="navbarsExample04" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    
+      <div class="collapse navbar-collapse mr-1" id="navs">
+        <ul class="navbar-nav ml-auto mr-5">
+          <!-- github icon -->
+          <li class="nav-link mr-1">
+            <a href="https://github.com/MUSA-509/final-project-jingzong-ben">
+              <span style="font-size: 27px; color: White;">
+                <i class="fab fa-github"></i>
+              </span>            
+            </a>
+          </li>
+          <!-- data sources -->
+          <li class="nav-item dropdown mt-2">
+            <a class="nav-link dropdown-toggle" href="#" id="navDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Data Sources
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navDropdown">
+              <a class="dropdown-item" href="https://www.transit.dot.gov/ntd/data-product/monthly-module-adjusted-data-release">National Transit Database</a>
+              <a class="dropdown-item" href="https://www.census.gov/programs-surveys/acs">ACS 5-year Estimates (2018)</a>
+              <a class="dropdown-item" href="https://github.com/nytimes/covid-19-data">The New York Times COVID-19 Repo</a>
+            </div>
+          </li>        
         </ul>
-                       
       </div>
     </nav>
 
-    <!-- Map -->
-    <div id="map">
-      {% include 'map.html' %}
+    <!-- Sidebar -->
+    <div class="container-fluid">
+      <nav id="sidebarMenu" class="d-md-block bg-light sidebar collapse">
+        <div class="sidebar-sticky pt-3">
+          <ul class="nav flex-column px-4">
+            <form action="{{ url_for('refresh') }}" method="GET">
+              <!-- month -->
+              <li class="nav-item py-1 my-1">              
+                <h6>Month</h6>
+                <select id= "month-select" name="month" class="selectpicker">
+                  {% for month in month_list %} 
+                    <option value= {{ month }}>{{ month }}</option>
+                  {% endfor %} 
+                </select>              
+              </li>
+
+              <!-- modes -->
+              <li class="nav-item py-1 my-1">              
+                <h6>Modes</h6>
+                <select id="mode-select" name="modes" class="selectpicker">
+                  <option value='Rail'>Rail</option>
+                  <option value='Non-Rail'>Non-Rail</option>
+                </select>              
+              </li>
+
+              <li class="nav-item mt-4 ">
+                <button type="submit" class="btn btn-dark" id="refresh">Refresh</button>
+              </li>
+
+            </form>
+          </ul>                        
+        </div>
+      </nav>
+
+      <!-- Map -->
+      <div id="map">
+        {% include 'map.html' %}
+      </div>
+
+      <!-- Select metro area -->
+      <div id="metroExplore">
+        <h6>Explore a Metro Area:</h6>
+        <form action="{{ url_for('metro') }}" method="GET">
+          <select class="selectpicker" id= "area-select" name="metroArea" data-live-search="true" data-width="500px">
+            {% for area in area_list %} 
+              <option value= {{ area }}>{{ area }}</option>
+            {% endfor %} 
+          </select> 
+          <button class="btn btn-dark" id="exploreBtn" type="submit">Explore ></button> 
+        </form>
+
+      </div>
+
     </div>
 
-    <!-- Select metro area -->
-    <div id="metroExplore">
-      <h6>Explore a Metro Area:</h6>
-      <form action="{{ url_for('metro') }}" method="GET">
-        <select class="selectpicker" id= "area-select" name="metroArea" data-live-search="true" data-width="500px">
-          {% for area in area_list %} 
-            <option value= {{ area }}>{{ area }}</option>
-          {% endfor %} 
-        </select> 
-        <button class="btn btn-dark" id="exploreBtn" type="submit">Explore ></button> 
-      </form>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
 
-    </div>
+    <script>
+      console.log("start");
+      // If there is no default option, select first one.
+      function setDefaultOpt(select, defaultOpt){
+        console.log(defaultOpt);
+        if (defaultOpt == null) defaultOpt = select[0].firstElementChild.innerText;    
+        select.selectpicker('val', defaultOpt); 
+        select.selectpicker("refresh");   
+      }
 
-  </div>
+      $( document ).ready(function() {
+        // Set default month 
+        var selectedMonth = {{ selected_month|tojson }};
+        console.log(selectedMonth);
+        setDefaultOpt($('#month-select'), selectedMonth);
 
-
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
-
-<script>
-  // If there is no default option, select first one.
-  function setDefaultOpt(select, defaultOpt){
-    console.log(defaultOpt);
-    if (defaultOpt == null) defaultOpt = select[0].firstElementChild.innerText;    
-    select.selectpicker('val', defaultOpt); 
-    select.selectpicker("refresh");   
-  }
-  
-  // Populate options from list.
-  // function populateOptions(select, optionList, defaultOpt) {
-  //   for(var i = 0; i < optionList.length; i++){
-  //     select.append('<option value="'+optionList[i]+'">'+optionList[i]+'</option>');;      
-  //   }  
-  //   select.selectpicker("refresh"); 
-  //   setDefaultOpt(select, defaultOpt);
-  // }
-
-  $( document ).ready(function() {
-    // Set default month 
-    var selectedMonth = {{ selected_month|tojson }};
-    setDefaultOpt($('#month-select'), selectedMonth);
-
-    // Set default modes
-    var selectedModes = {{ selected_modes|tojson }};
-    setDefaultOpt($('#mode-select'), selectedModes);
-
-  // Refresh button
-  // $('#refresh').on('click', async function() {
-  //   var month = $('#month-select').val();
-  //   var modes = $('modes-select').val();
-  //   var overlay = $('input[name=overlay]:checked').val();
-  //   console.log(`?select_date=${month}&select_classification=${modes}&select_metric=${overlay}`)
-  //   const res = await axios.get(`?select_date=${month}&select_classification=${modes}&select_metric=${overlay}`);    
-  // }); 
-
-
-
- 
-</script>
-<!-- End Document
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-</body>
+        // Set default modes
+        var selectedModes = {{ selected_modes|tojson }};
+        console.log(selectedModes);
+        setDefaultOpt($('#mode-select'), selectedModes);
+      });
+    
+    </script>
+    <!-- End Document ------------------------------------------------------------------------- -->
+  </body>
 </html>

@@ -11,7 +11,8 @@ import plotly.graph_objects as go
 
 #Initialize Query Connection
 app = Flask(__name__, template_folder="templates")
-bqclient = bigquery.Client.from_service_account_json('C:/Users/bennd/Documents/MUSA509/TransitPolicyApp-99838a65a6ed.json')
+# bqclient = bigquery.Client.from_service_account_json('C:/Users/bennd/Documents/MUSA509/TransitPolicyApp-99838a65a6ed.json')
+bqclient = bigquery.Client.from_service_account_json('C:/0_MUSA509/TransitPolicyApp-99838a65a6ed.json')
 pd.set_option('mode.chained_assignment', None)
 
 #Specify dropdown values (top 50 metro areas by total transit trips)
