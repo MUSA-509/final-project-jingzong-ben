@@ -8,9 +8,9 @@ import altair as alt
 from altair_saver import save
 import plotly.express as px
 from urllib.request import urlopen
+import plotly.graph_objects as go
 
 app = Flask(__name__, template_folder="templates")
-# bqclient = bigquery.Client.from_service_account_json('C:/0_MUSA509/TransitPolicyApp-99838a65a6ed.json')
 bqclient = bigquery.Client.from_service_account_json('C:/Users/bennd/Documents/MUSA509/TransitPolicyApp-99838a65a6ed.json')
 pd.set_option('mode.chained_assignment', None)
 
@@ -21,8 +21,73 @@ month_list = ['2019-01', '2019-02', '2019-03', '2019-04', '2019-05', '2019-06', 
 @app.route("/national_test/")
 def national():
     # Set default selection     
-    selected_month = request.args.get("month")
-    selected_modes = request.args.get("modes")
+    selected_month = "2020-09"
+    selected_modes = "Non-Rail"
+    selected_overlay = request.args.get("overlay")
+    selected_area = request.args.get("area")
+
+    query1 = (
+        'SELECT metro_area, GEOID10, month, sum(trips) as trips, classification, min(lat) as lat, min(lon) as lon'
+        ' FROM transitpolicyapp.ridership.Ridership'
+        ' WHERE month =  \''+selected_month + 
+         '\' AND classification =  \''+selected_modes + 
+         '\' GROUP BY metro_area, GEOID10, month, classification'
+    )
+
+    resp1 = bqclient.query(query1).to_dataframe()
+
+    query2 = (
+        'SELECT county_fips_code as fips, max(confirmed_cases) as cases, max(deaths) as deaths'
+        ' FROM bigquery-public-data.covid19_nyt.us_counties'
+        ' WHERE county_fips_code IS NOT NULL'
+        ' GROUP BY county_fips_code'
+    )
+    resp2 = bqclient.query(query2).to_dataframe()
+    
+    with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json') as response:
+        counties = json.load(response)
+
+    fig1 = px.scatter_mapbox(resp1, lat="lat", lon="lon", size="trips", 
+                            color_continuous_scale=px.colors.sequential.Jet, size_max=80, 
+                            zoom=3.5, hover_data=["trips"], hover_name='metro_area', width=1625, height=800
+                            )
+
+    fig1.update_layout(mapbox_style="open-street-map")
+    fig1.update_layout(title=f'Total {selected_modes} Transit Trips in {selected_month}')
+    fig1.write_html("templates/map.html")
+
+    fig2 = px.choropleth(resp2, geojson=counties, locations='fips', color='cases',
+                            color_continuous_scale="Reds",
+                            color_continuous_midpoint=5000, range_color=(0,300000),
+                            scope="usa")
+
+    fig2.update_layout(mapbox_style="open-street-map")
+    fig2.update_layout()
+    fig2.update_layout(title=f'Cumulative COVID-19 Cases')
+    fig2.write_html("templates/map_overlay.html")
+               
+    # Change map.html in templates folder if needed
+    # You can also set default selection here
+    html_response = render_template(
+        "national_view.html",
+        month_list = month_list,
+        selected_month = selected_month,
+        selected_modes = selected_modes,
+        selected_overlay = selected_overlay,
+        selected_area = selected_area,
+        area_list = area_list
+    )
+
+    # It will include map.html in templates folder
+    response = Response(response=html_response, status=200, mimetype="text/html")
+    return response
+
+# Endpoint for refresh page
+@app.route("/national_refresh/", methods=['GET'])
+def refresh():
+    # Set default selection     
+    selected_month = str(request.args.get("month"))
+    selected_modes = str(request.args.get("modes"))
     selected_overlay = request.args.get("overlay")
     selected_area = request.args.get("area")
     print(selected_month)
@@ -31,9 +96,11 @@ def national():
     query1 = (
         'SELECT metro_area, GEOID10, month, sum(trips) as trips, classification, min(lat) as lat, min(lon) as lon'
         ' FROM transitpolicyapp.ridership.Ridership'
-        ' WHERE month = "2020-04" AND classification = "Non-Rail"'
-        ' GROUP BY metro_area, GEOID10, month, classification'
+        ' WHERE month =  \''+selected_month + 
+         '\' AND classification =  \''+selected_modes + 
+         '\' GROUP BY metro_area, GEOID10, month, classification'
     )
+    print(query1)
     resp1 = bqclient.query(query1).to_dataframe()
 
     fig1 = px.scatter_mapbox(resp1, lat="lat", lon="lon", size="trips", 
@@ -41,7 +108,7 @@ def national():
                             zoom=3, hover_data=["trips"], hover_name='metro_area'
                             )
     fig1.update_layout(mapbox_style="open-street-map")
-    fig1.update_layout(title=f'Total Transit Trips')
+    fig1.update_layout(title=f'Total {selected_modes} Transit Trips in {selected_month}')
     fig1.write_html("templates/map.html")
 
     query2 = (
@@ -80,32 +147,6 @@ def national():
     response = Response(response=html_response, status=200, mimetype="text/html")
     return response
 
-# Endpoint for refresh page
-@app.route("/national_refresh/", methods=['GET'])
-def refresh():
-    # Get selections from user.
-    selected_month = request.args.get("month")
-    selected_modes = request.args.get("modes")
-    selected_overlay = request.args.get("overlay")
-    selected_area = request.args.get("area")
-    print(selected_month)
-    print(selected_modes)
-
-    # Change the map.html in templates folder, the map in the page will be replace
-    # Though I'm not sure it is the right way to do
-
-    html_response = render_template(
-        "national_view.html",
-        month_list = month_list,
-        selected_month = selected_month,
-        selected_modes = selected_modes,
-        selected_overlay = selected_overlay,
-        area_list = area_list, 
-        selected_area = selected_area       
-    )
-    response = Response(response=html_response, status=200, mimetype="text/html")
-    return response
-
 # Endpoint for first time loading metro area view
 @app.route("/metro_test/", methods=['GET'])
 def metro():
@@ -124,8 +165,12 @@ def metro():
     
     table_data = pd.melt(resp1, id_vars='metro_area', value_vars=['pop_18', 'hh_size', 'hh_income', 'rent_share', 'pt_share', 'service_share'])
     table_data = table_data.replace({'pop_18': 'Population (2018)', 'hh_size': 'Avg. Household Size', 'hh_income': 'Median Household Income', 'rent_share': 'Renter-occupied housing units', 'pt_share': 'Primary Mode to Work: Public Transit', 'service_share': 'Workers in Service Occupations'})
-    table_data = table_data[['variable','value']]
-    table_data = table_data.to_json(orient="values")
+    census_data = table_data[['variable','value']]
+
+    fig = go.Figure(data=[go.Table(header=dict(values=['Census Variable', 'Value']),
+                 cells=dict(values=[census_data.variable, census_data.value]))
+                     ])
+    fig.write_html("templates/table.html")
     
     #Example of new table_data output: [["Population (2018)",944348.0],["Avg. Household Size",2.72],["Median Household Income",92969.0],["Renter-occupied housing units",0.33],["Primary Mode to Work: Public Transit",0.1],["Workers in Service Occupations",0.18]]
     #table_data = {'0': selected_area,'1':'data1','2':'data2','3':'data3','4':'data4','5':'data5'}
@@ -138,7 +183,7 @@ def metro():
          '\' GROUP BY metro_area, month, mode, trips')
     resp2 = bqclient.query(query2).to_dataframe()
 
-    chart_ridership = px.area(resp2, x="month", y="trips", color="mode")
+    chart_ridership = px.area(resp2, x="month", y="trips", color="mode", title="Total Transit Trips by Mode", labels={'month':'Month', 'trips':'Total Transit Trips'})
     chart_ridership.write_html("templates/chart_ridership.html")
 
     #Scatterplot
@@ -152,7 +197,7 @@ def metro():
     )
     resp4 = bqclient.query(query4).to_dataframe()
 
-    chart_scatter = px.scatter(resp4, x="cases", y="trips")
+    chart_scatter = px.scatter(resp4, x="cases", y="trips", hover_data=['metro_area'], title="Relationship Between COVID and Transit Trips", labels={'cases':'COVID-19 Cases', 'trips':'Total Transit Trips'})
     chart_scatter.write_html("templates/chart_scatter.html")
 
     #COVID Charts
@@ -168,10 +213,10 @@ def metro():
     resp3['cases_avg'] = resp3.iloc[:,4].rolling(window=7).mean()
     resp3['deaths_avg'] = resp3.iloc[:,5].rolling(window=7).mean()
     
-    chart_cases = px.bar(resp3, x='date', y='cases_avg')
+    chart_cases = px.bar(resp3, x='date', y='cases_avg', color_discrete_sequence=["orange"], labels={'cases_avg':'New COVID-19 Cases', 'date':'Date'}, title="COVID-19 Cases")
     chart_cases.write_html("templates/chart_cases.html")
 
-    chart_deaths = px.bar(resp3, x='date', y='deaths_avg')
+    chart_deaths = px.bar(resp3, x='date', y='deaths_avg', color_discrete_sequence=["red"], labels={'deaths_avg':'New COVID-19 Deaths', 'date':'Date'}, title="COVID-19 Deaths")
     chart_deaths.write_html("templates/chart_deaths.html")
 
     #Response
@@ -261,7 +306,6 @@ def change_area():
     )
     response = Response(response=html_response, status=200, mimetype="text/html")
     return response
-
 
 if __name__ == "__main__":
     app.jinja_env.auto_reload = True
