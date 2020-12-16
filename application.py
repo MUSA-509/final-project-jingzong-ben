@@ -10,9 +10,8 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 #Initialize Query Connection
-app = Flask(__name__, template_folder="templates")
-# bqclient = bigquery.Client.from_service_account_json('C:/Users/bennd/Documents/MUSA509/TransitPolicyApp-99838a65a6ed.json')
-bqclient = bigquery.Client.from_service_account_json('C:/0_MUSA509/TransitPolicyApp-99838a65a6ed.json')
+application = Flask(__name__, template_folder="templates")
+bqclient = bigquery.Client.from_service_account_json('./TransitPolicyApp-99838a65a6ed.json')
 pd.set_option('mode.chained_assignment', None)
 
 #Specify dropdown values (top 50 metro areas by total transit trips)
@@ -20,7 +19,7 @@ area_list = ['Bridgeport-Stamford', 'Buffalo', 'Charlotte', 'Chicago', 'Cincinna
 month_list = ['2019-01', '2019-02', '2019-03', '2019-04', '2019-05', '2019-06', '2019-07', '2019-08', '2019-09', '2019-10', '2019-11', '2019-12', '2020-01', '2020-02', '2020-03', '2020-04', '2020-05', '2020-06', '2020-07', '2020-08', '2020-09']
 
 # Endpoint for first time loading national view
-@app.route("/")
+@application.route("/")
 def national():
     # Set default selection     
     selected_month = "2020-09"
@@ -61,7 +60,7 @@ def national():
     return response
 
 # Endpoint for refresh page
-@app.route("/national_refresh/", methods=['GET'])
+@application.route("/national_refresh/", methods=['GET'])
 def refresh():
     # Pull variables from dropdowns    
     selected_month = str(request.args.get("month"))
@@ -102,7 +101,7 @@ def refresh():
     return response
 
 # Endpoint for first time loading metro area view
-@app.route("/metro_test/", methods=['GET'])
+@application.route("/metro_test/", methods=['GET'])
 def metro():
     selected_area = request.args.get('metroArea')
 
@@ -180,7 +179,7 @@ def metro():
     return response
 
 # Endpoint for changing area
-@app.route("/metro", methods=['GET'])
+@application.route("/metro", methods=['GET'])
 def change_area():
     selected_area = request.args.get('metroArea')
 
