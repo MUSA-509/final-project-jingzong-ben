@@ -2,6 +2,7 @@
 
 | Rubric Item                                                  | Percentage | Score | Comments                                                     |
 | ------------------------------------------------------------ | ---------- | ----- | ------------------------------------------------------------ |
+| **Documentation**                                            | **25%**    | -     |                                                              |
 | API endpoints are well-defined                               | 5%         | 2     | no documentation indicating endpoints                        |
 | Has a problem that is well-defined in abstract               | 4%         | 4     |                                                              |
 | Data Sources are well-listed, including any data processing steps | 4%         | 4     |                                                              |
